@@ -1,0 +1,71 @@
+﻿@model RegisterUserViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Identity Kayit Formu</title>
+    <!-- Mobile Specific Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <!-- Font-->
+    <link rel="stylesheet" type="text/css" href="/colorlib-regform-35/css/nunito-font.css">
+    <!-- Main Style Css -->
+    <link rel="stylesheet" href="/colorlib-regform-35/css/style.css" />
+    <style>
+            .text-danger {
+                color: #e74c3c;
+                font-size: 0.8em;
+                margin-top: 5px;
+                display: block;
+            }
+    </style>
+</head>
+<body class="form-v9">
+    <div class="page-content">
+        <div class="form-v9-content" style="background-image: url('/colorlib-regform-35/images/form-v9.jpg')">
+            <form class="form-detail" method="post">
+                <h2>Yeni Kullanici Kaydi</h2>
+                <div class="form-row-total">
+                    <div class="form-row">
+                        <input type="text"asp-for="Name" class="input-text" placeholder="Adiniz" >
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" asp-for="Surname" class="input-text" placeholder="Soyadiniz">
+                        <span asp-validation-for="Surname" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-row-total">
+                    <div class="form-row">
+                        <input type="text" asp-for="Email" class="input-text" placeholder="E-posta">
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" asp-for="UserName" class="input-text" placeholder="Kullanici Adi">
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-row-total">
+                    <div class="form-row">
+                        <input type="password" asp-for="Password" class="input-text" placeholder="Parola">
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+                    <div class="form-row">
+                        <input type="password" asp-for="ConfirmPassword" class="input-text" placeholder="Parolayi Onayla">
+                        <span asp-validation-for="ConfirmPassword" class="text-danger text-center"></span>
+                    </div>
+                </div>
+                <div class="text-danger" asp-validation-summary="ModelOnly"></div>
+                <div class="form-row-last">
+                    <input type="submit" name="register" class="register" value="Kayit Ol">
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+</body>
+</html>

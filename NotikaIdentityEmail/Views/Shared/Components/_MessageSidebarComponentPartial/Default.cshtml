@@ -1,0 +1,28 @@
+﻿<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+    <div class="inbox-left-sd">
+        <div class="compose-ml">
+            <a class="btn" href="#">Compose</a>
+        </div>
+        <div class="inbox-status">
+            <ul class="inbox-st-nav inbox-ft">
+                <li><a href="#"><i class="notika-icon notika-mail"></i> Gelen Kutusu<span class="pull-right">12</span></a></li>
+                <li><a href="#"><i class="notika-icon notika-sent"></i> Gonderilmis Postalar</a></li>
+                <li><a href="#"><i class="notika-icon notika-draft"></i></a>Taslak</li>
+                <li><a href="#"><i class="notika-icon notika-trash"></i>  Cop Kutusu</a></li>
+            </ul>
+        </div>
+        <hr>
+        @await Component.InvokeAsync("_MessageCategoryListSideBarComponentsPartial")
+       
+        <hr>
+        <div class="inbox-status">
+            <ul class="inbox-st-nav inbox-nav-mg">
+                <li><a href="#"><i class="notika-icon notika-success"></i> Forum</a></li>
+                <li><a href="#"><i class="notika-icon notika-chat"></i> Chat</a></li>
+                <li><a href="#"><i class="notika-icon notika-star"></i> Is Akisi</a></li>
+                <li><a href="#"><i class="notika-icon notika-settings"></i> Ayarlar</a></li>
+                <li><a href="#"><i class="notika-icon notika-support"></i> Destek</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
