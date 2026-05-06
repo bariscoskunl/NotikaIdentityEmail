@@ -1,4 +1,4 @@
-﻿@model AppUser
+﻿@model UserEditViewModel
 @{
     ViewData["Title"] = "EditProfile";
     Layout = "~/Views/UserLayout/Index.cshtml";
@@ -11,7 +11,7 @@
                 <div class="form-element-list">
                     <div class="basic-tb-hd">
                         <h2>Profilimi Düzenle</h2>
-                        <p>Lütfen bilgileri eksiksiz olarak doldurup güncelleme işlemini yapınız.</p>
+                        <p>bilgileri eksiksiz olarak doldurup güncelleme işlemini yapınız.</p>
                     </div>
                     <form method="post">
                         <div class="row">
@@ -90,7 +90,7 @@
                                 <div class="form-group ic-cmp-int">
                                     <div class="form-ic-cmp"><i class="notika-icon notika-edit"></i></div>
                                     <div class="nk-int-st">
-                                        <input type="password" name="Password" class="form-control" placeholder="Yeni Şifre (Değiştirmeyecekseniz boş bırakın)">
+                                        <input type="password" asp-for="Password" class="form-control" placeholder="Yeni Şifre (Değiştirmeyecekseniz boş bırakın)">
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@
                                 <div class="form-group ic-cmp-int">
                                     <div class="form-ic-cmp"><i class="notika-icon notika-edit"></i></div>
                                     <div class="nk-int-st">
-                                        <input type="password" name="ConfirmPassword" class="form-control" placeholder="Şifre Tekrar">
+                                        <input type="password" asp-for="PasswordConfirm" class="form-control" placeholder="Şifre Tekrar">
                                     </div>
                                 </div>
                             </div>

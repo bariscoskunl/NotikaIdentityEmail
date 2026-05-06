@@ -22,11 +22,11 @@
 	<link rel="stylesheet" type="text/css" href="/Login_v4/css/main.css">
 	
 </head>
-<body>
-	
+<body>	
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('/Login_v4/images/bg-01.jpg');">
 			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
+				<div class="text-danger" asp-validation-summary="ModelOnly" style="margin-bottom: 15px;"></div>
 				<form class="login100-form validate-form" asp-action="UserLogin" asp-controller="Login" method="post">
 					<span class="login100-form-title p-b-49">
 						Login
@@ -64,7 +64,7 @@
 							Veya Bunlari dene
 						</span>
 					</div>
-
+					
 					<div class="flex-c-m">
 						<a href="#" class="login100-social-item bg1">
 							<i class="fa fa-facebook"></i>

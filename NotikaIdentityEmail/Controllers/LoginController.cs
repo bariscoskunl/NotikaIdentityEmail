@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using NotikaIdentityEmail.Context;
 using NotikaIdentityEmail.Entities;
 using NotikaIdentityEmail.Models;
 
@@ -8,10 +10,12 @@ namespace NotikaIdentityEmail.Controllers
     public class LoginController : Controller
     {
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly EmailContext _context;
 
-        public LoginController(SignInManager<AppUser> signInManager)
+        public LoginController(SignInManager<AppUser> signInManager, EmailContext context)
         {
             _signInManager = signInManager;
+            _context = context;
         }
         [HttpGet]
         public IActionResult UserLogin()
@@ -25,11 +29,16 @@ namespace NotikaIdentityEmail.Controllers
             {
                 return View(model);
             }
-            var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, true, true);
-            if (result.Succeeded)
+
+            var value = _context.Users.Where(x => x.UserName == model.UserName).FirstOrDefault();
+            if (value.EmailConfirmed == true)
             {
-                return RedirectToAction("Profile", "MyProfile");
-            }
+                var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, true, true);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Profile", "EditProfile");
+                }
+            }            
             ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı!");
             return View(model);
         }
