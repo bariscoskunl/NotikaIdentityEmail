@@ -73,6 +73,7 @@ namespace NotikaIdentityEmail.Controllers
                 client.Send(mimeMessage);// mimeMessage ile degeri gonderdik
                 client.Disconnect(true); // baglantiyi kes
 
+                TempData["EmailMove"] = model.Email;
 
                 return RedirectToAction("UserActivation", "Activation");
             }

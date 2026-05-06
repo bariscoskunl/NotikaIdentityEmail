@@ -1,6 +1,7 @@
 ﻿
 @{
-    Layout = null;
+	Layout = null;
+
 }
 
 <!DOCTYPE html>
@@ -27,13 +28,16 @@
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('/Login_v4/images/bg-01.jpg');">
 			<div class="wrap-login100 p-l-55 p-r-55 p-t-65 p-b-54">
-				<form class="login100-form validate-form" asp-action="UserLogin" asp-controller="Login" method="post">
+				@if (ViewBag.ErrorMessage != null)
+				{
+					<div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+				}
+				<form class="login100-form validate-form" asp-action="UserActivation" asp-controller="Activation" method="post">
 					<span class="login100-form-title p-b-49">
 						Email Validasyon
-					</span>
-
+					</span>					
 					<div class="wrap-input100 validate-input m-b-23">						
-						<input class="input100" type="text" placeholder="Dogrulama Kodunu giriniz">
+						<input class="input100" type="text" name="userCodeParamater" placeholder="Dogrulama Kodunu giriniz">
 						<span class="focus-input100" data-symbol="&#xf206;"></span>
 					</div>					
 					
