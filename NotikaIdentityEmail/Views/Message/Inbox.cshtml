@@ -39,18 +39,40 @@
                                 <th>#</th>
                                 <th>Gonderici</th>
                                 <th>Konu</th>
+                                <th>Icerik</th>
                                 <th>Kategori</th>
+                                <th>Gonderim Tarihi</th>
                             </tr>
                             <tbody>
                                 @foreach (var item in Model)
                                 {
                                     <tr>
                                         <td class=""><label><input type="checkbox" class="i-checks"></label></td>
-                                        <td><a href="#">@item.SenderName @item.SenderSurname </a>  </td>
-                                        <td><a href="#">@item.Subject </a>  </td>
-                                        <td> <a href="#"><strong>@item.Subject</strong> @item.MessageDetail.Substring(0, 20)... </a></td>
-                                        <td></td>
-                                        <td class="text-right mail-date">@item.SendDate.ToShortDateString()</td>
+                                        <td><a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId">@item.SenderName @item.SenderSurname </a>  </td>
+                                        <td><a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId">@item.Subject </a>  </td>
+                                        <td><a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId">@item.MessageDetail.Substring(0, 20)... </a></td>
+                                        @{                                           
+                                            @switch(item.CategoryName)
+                                            {
+                                                case "Egitim":
+                                                    <td><span class="label label-warning">@item.CategoryName</span></td>
+                                                    break;
+                                                case "Kampanyalar":
+                                                    <td><span class="label label-info">@item.CategoryName</span></td>
+                                                    break;
+                                                case "Sosyal":
+                                                    <td><span class="label label-success">@item.CategoryName</span></td>
+                                                    break;
+                                                case "Finans":
+                                                    <td><span class="label label-primary">@item.CategoryName</span></td>
+                                                    break;
+                                                case "Seyahat":
+                                                    <td><span class="label label-default">@item.CategoryName</span></td>
+                                                    break;
+                                            }
+                                        }
+                                        
+                                        <td class="text-right mail-date">@item.SendDate.ToString("dd MMMM yyyy")</td>
                                     </tr>
                                 }
                             </tbody>

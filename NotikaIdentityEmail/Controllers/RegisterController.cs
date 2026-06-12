@@ -52,6 +52,13 @@ namespace NotikaIdentityEmail.Controllers
 
             if (result.Succeeded)
             {
+                var registeredUser = await _userManager.FindByEmailAsync(model.Email);
+                if (registeredUser != null)
+                {
+                    registeredUser.ActivationCode = code;
+                    await _userManager.UpdateAsync(registeredUser);
+                }
+
                 // mail kodlari // yemi uukb anso zryu
                 MimeMessage mimeMessage = new MimeMessage(); // MimeMessage uzerinden bir mail uretiyor
 

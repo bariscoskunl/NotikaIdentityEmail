@@ -16,34 +16,40 @@ namespace NotikaIdentityEmail.Controllers
         [HttpGet]
         public IActionResult UserActivation()
         {
-            var email = TempData["EmailMove"];
-            TempData["Move"] = email;
+            if (TempData["EmailMove"] != null)
+            {
+                TempData["Move"] = TempData["EmailMove"];
+            }
             return View();
         }
 
         [HttpPost]
         public IActionResult UserActivation(int userCodeParamater)
         {
-            if (TempData["Move"] == null)
+            if (TempData.Peek("Move") == null)
             {
                 return RedirectToAction("CreateUser", "Register");
             }
 
             string email = TempData["Move"].ToString();
 
-            TempData.Keep("Move");
+            var user = _context.Users.FirstOrDefault(x => x.Email == email);
 
-            var code = _context.Users.Where(x => x.Email == email).Select(y => y.ActivationCode).FirstOrDefault();
-
-            if (userCodeParamater == code)
+            if (user == null)
             {
-                var value = _context.Users.Where(x => x.Email == email).FirstOrDefault();
-                value.EmailConfirmed = true;
+                ViewBag.ErrorMessage = "Kullanıcı bulunamadı.";
+                return View();
+            }
+
+            if (userCodeParamater == user.ActivationCode)
+            {
+                user.EmailConfirmed = true;
                 _context.SaveChanges();
+                TempData.Remove("Move");
                 return RedirectToAction("UserLogin", "Login");
             }
             ViewBag.ErrorMessage = "Girdiğiniz kod hatalı, lütfen tekrar deneyin.";
-            return View();           
+            return View();
         }
     }
 }

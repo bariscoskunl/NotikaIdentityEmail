@@ -3,7 +3,30 @@
     ViewData["Title"] = "MessageDetail";
     Layout = "~/Views/UserLayout/Index.cshtml";
 }
-
+@{
+    var timeDiff = DateTime.Now - Model.SendDate;
+    string timeAgoText;
+    if (timeDiff.TotalMinutes < 1)
+    {
+        timeAgoText = "Simdi";
+    }
+    else if (timeDiff.TotalMinutes < 60)
+    {
+        timeAgoText = $"{(int)timeDiff.TotalMinutes} dakika önce";
+    }
+    else if (timeDiff.TotalHours < 24)
+    {
+        timeAgoText = $"{(int)timeDiff.TotalMinutes} saat önce";
+    }
+    else if (timeDiff.TotalDays < 7)
+    {
+        timeAgoText = $"{(int)timeDiff.TotalDays} gun önce";
+    }
+    else
+    {
+        timeAgoText = Model.SendDate.ToString("dd MM yyyy");    
+    }
+}
 <div class="inbox-area">
     <div class="container">
         <div class="row">
@@ -17,16 +40,16 @@
                             <h2>Mesaj Detaylari</h2>
                         </div>
                         <div class="view-ml-rl">
-                            <p>2 saat once</p>
+                            <p>@Model.SendDate.ToString("HH:mm")--(<span style="color:#6c757d">@timeAgoText</span>)</p>
                         </div>
                     </div>
                     <div class="mail-ads mail-vw-ph">
                         <p class="first-ph"><b>Subject: </b>@Model.Subject</p>
                         <p><b>Email:</b> <a href="#">@Model.SenderEmail</a></p>
-                        <p class="last-ph"><b>Tarih:</b> @Model.SendDate</p>
+                        <p class="last-ph"><b>Tarih:</b>@Model.SendDate.ToString("dd MMMM yyyy")</p>
                     </div>
                     <div class="view-mail-atn">
-                        <p>@Model.MessageDetail</p>                       
+                        <p>@Html.Raw(Model.MessageDetail)</p>                       
                     </div>
                     <div class="vw-ml-action-ls text-right mg-t-20">
                         <div class="btn-group ib-btn-gp active-hook nk-email-inbox">
