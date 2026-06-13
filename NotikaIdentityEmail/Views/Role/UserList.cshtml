@@ -1,0 +1,44 @@
+﻿@model List<AppUser>
+@{
+    TempData["Title"] = "UserList";
+    Layout = "~/Views/UserLayout/Index.cshtml";
+    int count = 0;
+}
+
+<div class="form-element-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="form-element-list">
+                    <div class="basic-tb-hd">
+                        <h2>Kullanıcı Listesi</h2>
+                    </div>
+                    <div class="row">
+                        <table class="table table-bordered ">
+                            <tr>
+                                <th>#</th>
+                                <th>Ad Soyad</th>
+                                <th>Kullanici Adi</th>
+                                <th>Kullanici Email</th>
+                                <th>Rol ata</th>                                
+                            </tr>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    count++;
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.Name @item.Surname</td>
+                                        <td>@item.UserName</td>
+                                        <td>@item.Email</td>
+                                        <td><a asp-action="AssignRole" asp-route-id="@item.Id" class="btn btn-warning">Rol ata</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
