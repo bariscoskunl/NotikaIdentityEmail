@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace NotikaIdentityEmail.Models
+namespace NotikaIdentityEmail.Models.IdentityModels
 {
     public class CustomIdentityValidator : IdentityErrorDescriber //Her bir hata override edilecek.
     {

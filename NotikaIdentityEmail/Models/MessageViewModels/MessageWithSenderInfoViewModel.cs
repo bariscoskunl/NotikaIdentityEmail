@@ -1,4 +1,4 @@
-﻿namespace NotikaIdentityEmail.Models
+﻿namespace NotikaIdentityEmail.Models.MessageViewModels
 {
     public class MessageWithSenderInfoViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NotikaIdentityEmail.Models
+namespace NotikaIdentityEmail.Models.IdentityModels
 {
     public class RegisterUserViewModel
     {
