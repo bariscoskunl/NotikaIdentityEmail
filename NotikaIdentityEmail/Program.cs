@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,62 +12,76 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<EmailContext>().AddErrorDescriber<CustomIdentityValidator>().AddDefaultTokenProviders(); // Burada Identity için gerekli servisleri ekliyoruz. AppUser ve IdentityRole tiplerini kullanıyoruz. Ayrıca Entity Framework ile EmailContext'i kullanarak veritabanı işlemlerini yapıyoruz. CustomIdentityValidator ile özel doğrulama kurallarını ekliyoruz. DataProtectorTokenProvider ile token üretimi için gerekli sağlayıcıyı ekliyoruz.
-// AddEntityFrameworkStores IDentity sistemini veritabaniyla calisabilmesi icin gerekli baglantiyi kurar.
-// AddErrorDescriber , CustomIdentityValidator icine yazidimiz mesajlar icin 
+// 1. IDENTITY & DATABASE CONFIGURATION
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<EmailContext>()
+    .AddErrorDescriber<CustomIdentityValidator>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddControllersWithViews();
 
 var connectionString = builder.Configuration.GetConnectionString("Default");
-builder.Services.AddDbContext<EmailContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<EmailContext>(options => options.UseSqlServer(connectionString));
 
+// 2. CONFIGURATION BINDING (IOptions Pattern)
 builder.Services.Configure<JwtSettingsModel>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<EmailSettingsModel>(builder.Configuration.GetSection("EmailSettings"));
 
-// =========================================================================
-// JWT AYARLARINI SİLDİK VE YERİNE STANDART IDENTITY COOKIE AYARLARINI EKLEDİK
-// =========================================================================
+// 3. GÖRSELDEKİ HYBRID AUTHENTICATION MIMARISI (Cookie + JWT)
+builder.Services.AddAuthentication(options =>
+{
+    // ÖĞRENME NOTU: Görseldeki gibi varsayılan şemayı Cookie yapıyoruz.
+    // Böylece normal MVC sayfaların (Profile, Message vb.) tarayıcı çerezinden sorunsuz okunur, 'null' hatası vermez.
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+})
+
+.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, opt =>
+{
+    // ÖĞRENME NOTU: Kaldırmak istemediğimiz, dersin asıl konusu olan JWT doğrulaması burada aktif kalıyor.
+    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettingsModel>();
+    opt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
+    };
+});
+//  AddCookie içindeki LoginPath ayarlarını Identity projesinde burası yönetir:
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    // Eğer kullanıcı giriş yapmadıysa ve yetkili bir sayfaya gitmeye çalışırsa buraya yönlendirilir:
     options.LoginPath = "/Login/UserLogin";
-
-    // Yetkisi yetmeyenlerin yönlendirileceği sayfa:
     options.AccessDeniedPath = "/Error/403";
-
-    // Tarayıcı çerezinin ömrü (Örn: 60 dakika)
     options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
-
-    // Kullanıcı tarayıcıyı kapatsa bile RememberMe seçeneğiyle çerezin kalıcı olmasını sağlar
     options.SlidingExpiration = true;
 });
-// =========================================================================
-
 var app = builder.Build();
 
-app.UseStatusCodePagesWithReExecute("/Error/{0}"); 
+// 4. MIDDLEWARE PIPELINE
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
+// ÖĞRENME NOTU: Kimlik doğrulama (Authentication) her zaman yetkilendirmeden (Authorization) önce gelmelidir.
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
