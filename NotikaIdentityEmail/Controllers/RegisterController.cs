@@ -1,22 +1,26 @@
 ﻿using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.TagHelpers;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using NotikaIdentityEmail.Entities;
+using NotikaIdentityEmail.Models.EmailModels;
 using NotikaIdentityEmail.Models.IdentityModels;
-using System.Net.Mail;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace NotikaIdentityEmail.Controllers
 {
+    [AllowAnonymous]
     public class RegisterController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly EmailSettingsModel _emailSettings;
 
-        public RegisterController(UserManager<AppUser> userManager)
+        public RegisterController(UserManager<AppUser> userManager, IOptions<EmailSettingsModel> emailSettings)
         {
             _userManager = userManager;
+            _emailSettings = emailSettings.Value;
         }
 
         [HttpGet]
@@ -46,7 +50,6 @@ namespace NotikaIdentityEmail.Controllers
                 Surname = model.Surname,
                 UserName = model.UserName,
                 ActivationCode = code,
-
             };
             var result = await _userManager.CreateAsync(appUser, model.Password);
 
@@ -59,26 +62,28 @@ namespace NotikaIdentityEmail.Controllers
                     await _userManager.UpdateAsync(registeredUser);
                 }
 
-                // mail kodlari // yemi uukb anso zryu
-                MimeMessage mimeMessage = new MimeMessage(); // MimeMessage uzerinden bir mail uretiyor
+                // mail kodlari
+                MimeMessage mimeMessage = new MimeMessage();
 
-                MailboxAddress mailboxAddressFrom = new MailboxAddress("Admin", "bariscoskun441@gmail.com"); //mailin kimden gonderilecegi
-                mimeMessage.From.Add(mailboxAddressFrom); //mimeMessage araciligiyla kimden gonderilecegini belirttik.
+                MailboxAddress mailboxAddressFrom = new MailboxAddress(_emailSettings.SenderName, _emailSettings.SenderEmail);
+                mimeMessage.From.Add(mailboxAddressFrom);
 
-                MailboxAddress mailboxAddressTo = new MailboxAddress("User", model.Email); // mailin kime gonderilecegi belirtildi
-                mimeMessage.To.Add(mailboxAddressTo);// mimeMessage araciligiyla kime gidecegini ekledik
+                MailboxAddress mailboxAddressTo = new MailboxAddress("User", model.Email);
+                mimeMessage.To.Add(mailboxAddressTo);
 
                 var bodyBuilder = new BodyBuilder();
                 bodyBuilder.TextBody = "Hesabinizi dogrulamak icin gerekli olan aktivasyon kodu " + code;
-                mimeMessage.Body = bodyBuilder.ToMessageBody(); //mimeMessage araciligiyla mesaj icerigi gonderdik
+                mimeMessage.Body = bodyBuilder.ToMessageBody();
 
                 mimeMessage.Subject = "Notika Identity Aktivasyon Kodu";
 
-                SmtpClient client = new SmtpClient(); //Mailkit client sinfindan cliet olustu(mail transfer protokolu)
-                client.Connect("smtp.gmail.com", 587, false); // saglayici adi, port numarasi(turkiye icin),...
-                client.Authenticate("bariscoskun441@gmail.com", "yemi uukb anso zryu");// Yetkilendirme icin bizim mail ve mailden aldigimiz aktivasyon kodumuz
-                client.Send(mimeMessage);// mimeMessage ile degeri gonderdik
-                client.Disconnect(true); // baglantiyi kes
+                using (SmtpClient client = new SmtpClient())
+                {
+                    await client.ConnectAsync(_emailSettings.Host, _emailSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+                    await client.AuthenticateAsync(_emailSettings.SenderEmail, _emailSettings.Password);
+                    await client.SendAsync(mimeMessage);
+                    await client.DisconnectAsync(true);
+                }
 
                 TempData["EmailMove"] = model.Email;
 

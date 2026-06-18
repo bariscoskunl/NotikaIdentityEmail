@@ -38,7 +38,7 @@ namespace NotikaIdentityEmail.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, true, true);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Profile", "EditProfile");
+                    return RedirectToAction("EditProfile", "Profile");
                 }
             }            
             ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı!");

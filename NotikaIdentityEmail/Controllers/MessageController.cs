@@ -9,6 +9,7 @@ using NotikaIdentityEmail.Models.MessageViewModels;
 
 namespace NotikaIdentityEmail.Controllers
 {
+    [Authorize]
     public class MessageController : Controller
     {
         private readonly EmailContext _context;
