@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +32,7 @@ namespace NotikaIdentityEmail.Controllers
                 return View(model);
             }
 
-            var value = _context.Users.Where(x => x.UserName == model.UserName).FirstOrDefault();
+            var value = _context.Users.Where(x => x.UserName == model.UserName || x.Email == model.UserName).FirstOrDefault();
             if (value.EmailConfirmed == true)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, true, true);
@@ -43,6 +43,13 @@ namespace NotikaIdentityEmail.Controllers
             }            
             ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı!");
             return View(model);
+        }
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> UserLogout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("UserLogin", "Login");
         }
     }
 }

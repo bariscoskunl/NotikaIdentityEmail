@@ -72,6 +72,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 app.UseRouting();
 
 // ÖĞRENME NOTU: Kimlik doğrulama (Authentication) her zaman yetkilendirmeden (Authorization) önce gelmelidir.

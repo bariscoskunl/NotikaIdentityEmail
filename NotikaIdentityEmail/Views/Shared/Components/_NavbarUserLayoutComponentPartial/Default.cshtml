@@ -1,4 +1,4 @@
-﻿<div class="main-menu-area mg-tb-40">
+<div class="main-menu-area mg-tb-40">
     <div class="container">
         <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
@@ -11,71 +11,83 @@
                     </li>
                     <li>
                         <a data-toggle="tab" href="#Interface"><i class="notika-icon notika-edit"></i>Profil </a>
+                    </li>                    
+                    <li>
+                        <a data-toggle="tab" href="#Users"><i class="notika-icon notika-windows"></i> Kullanicilar</a>
                     </li>
                     <li>
-                        <a data-toggle="tab" href="#Charts"><i class="notika-icon notika-bar-chart"></i> Ayarlar</a>
+                        <a data-toggle="tab" href="#Roles"><i class="notika-icon notika-windows"></i> Roller</a>
                     </li>
                     <li>
-                        <a data-toggle="tab" href="#Tables"><i class="notika-icon notika-windows"></i> Kullanicilar</a>
+                        <a data-toggle="tab" href="#Settings"><i class="notika-icon notika-bar-chart"></i> Ayarlar</a>
                     </li>
                 </ul>
                 <div class="tab-content custom-menu-content">
                     <div id="Home" class="tab-pane in notika-tab-menu-bg animated flipInX">
                         <ul class="notika-main-menu-dropdown">
                             <li>
-                                <a href="index.html">Dashboard One</a>
-                            </li>                           
-                        </ul>
+                                <a asp-controller="Home" asp-action="Index">Dashboard</a>
+                            </li>  
+                            <li>
+                                <a asp-controller="UserLayout" asp-action="Index">İstatistikler</a>
+                            </li>
+                        </ul>                       
                     </div>
                     <div id="mailbox" class="tab-pane active notika-tab-menu-bg animated flipInX">
                         <ul class="notika-main-menu-dropdown">
                             <li>
-                                <a href="inbox.html">Inbox</a>
-                            </li>
+                                <a asp-controller="Message" asp-action="Inbox">Gelen Kutusu</a>
+                            </li>                            
                             <li>
-                                <a href="view-email.html">View Email</a>
-                            </li>
+                                <a asp-controller="Message" asp-action="Sendbox">Gönderilen Mesajlar</a>
+                            </li>                            
                             <li>
-                                <a href="compose-email.html">Compose Email</a>
-                            </li>
+                                <a asp-controller="Message" asp-action="ComposeMessage">Yeni Mesaj Oluştur</a>
+                            </li>                            
                         </ul>
                     </div>
                     <div id="Interface" class="tab-pane notika-tab-menu-bg animated flipInX">
                         <ul class="notika-main-menu-dropdown">
                             <li>
-                                <a href="animations.html">Animations</a>
-                            </li>
+                                <a asp-controller="Profile" asp-action="EditProfile">Profili Düzenle</a>
+                            </li>  
                             <li>
-                                <a href="google-map.html">Google Map</a>
-                            </li>
-                            <li>
-                                <a href="data-map.html">Data Maps</a>
-                            </li>
-                            <li>
-                                <a href="code-editor.html">Code Editor</a>
-                            </li>
-                            <li>
-                                <a href="image-cropper.html">Images Cropper</a>
-                            </li>
-                            <li>
-                                <a href="wizard.html">Wizard</a>
+                                <a asp-controller="PasswordChange" asp-action="ForgetPassword">Şifre Değiştir</a>
                             </li>
                         </ul>
                     </div>
-                    <div id="Charts" class="tab-pane notika-tab-menu-bg animated flipInX">
+                    <div id="Users" class="tab-pane notika-tab-menu-bg animated flipInX">
                         <ul class="notika-main-menu-dropdown">
                             <li>
-                                <a href="flot-charts.html">Flot Charts</a>
-                            </li>                            
+                                <a asp-controller="Role" asp-action="UserList">Kullanıcı Listesi</a>
+                            </li>                                           
+                            <li>
+                                <a asp-controller="Register" asp-action="CreateUser">Yeni Kullanıcı</a>
+                            </li>                                           
                         </ul>
-                    </div>
-                    <div id="Tables" class="tab-pane notika-tab-menu-bg animated flipInX">
+                    </div>                    
+                    <div id="Roles" class="tab-pane notika-tab-menu-bg animated flipInX">
                         <ul class="notika-main-menu-dropdown">
                             <li>
-                                <a href="normal-table.html">Normal Table</a>
-                            </li>                           
+                                <a asp-controller="Role" asp-action="RoleList">Rol Listesi</a>
+                            </li>                                           
+                            <li>
+                                <a asp-controller="Role" asp-action="CreateRole">Yeni Rol Oluştur</a>
+                            </li>                                           
                         </ul>
-                    </div>
+                    </div>                    
+                    <div id="Settings" class="tab-pane notika-tab-menu-bg animated flipInX">
+                        <ul class="notika-main-menu-dropdown">                                        
+                            <li>
+                                <a asp-controller="Profile" asp-action="EditProfile">Sistem Ayarları</a>
+                            </li>                                           
+                            <li>
+                                <form asp-controller="Login" asp-action="UserLogout" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-link p-0" style="color:inherit; text-decoration:none;">Çıkış Yap</button>
+                                </form>
+                            </li>                                           
+                        </ul>
+                    </div>                    
                 </div>
             </div>
         </div>

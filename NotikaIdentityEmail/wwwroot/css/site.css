@@ -29,3 +29,94 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* =============================================
+   Inbox / Tablo Görsel Düzeltmeleri
+   ============================================= */
+
+/* Genel tablo hücre taşmasını önle */
+.table-inbox td,
+.table-inbox th {
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+/* İçerik (önizleme) sütunu */
+.table-inbox td:nth-child(4) {
+    max-width: 160px;
+}
+
+/* Tarih sütunu — hiç kırılmasın */
+.table-inbox .mail-date {
+    white-space: nowrap;
+    width: 140px;
+    min-width: 120px;
+}
+
+/* Kategori etiketi hizalama */
+.table-inbox .label {
+    display: inline-block;
+    padding: 3px 8px;
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+/* Checkbox sütunu sabit genişlik */
+.table-inbox td:first-child {
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
+    text-align: center;
+}
+
+/* UserList / RoleList tablo genel hizalama */
+.table-bordered th,
+.table-bordered td {
+    vertical-align: middle;
+}
+
+.table-bordered .btn {
+    white-space: nowrap;
+}
+
+/* Sidebar menü metin taşmasını önle */
+.inbox-st-nav li {
+    position: relative;
+}
+
+.inbox-st-nav li a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inbox-st-nav li a .pull-right {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Mesaj detay görünüm düzeltmeleri */
+.view-mail-hd {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mail-ads p {
+    margin-bottom: 6px;
+    word-break: break-word;
+}
+
+/* Tablo responsive scroll sorununu düzelt */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}

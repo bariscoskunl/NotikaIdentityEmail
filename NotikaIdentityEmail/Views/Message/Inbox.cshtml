@@ -1,4 +1,4 @@
-﻿@model List<MessageWithSenderInfoViewModel>
+@model List<MessageWithSenderInfoViewModel>
 @{
     ViewData["Title"] = "Inbox";
     Layout = "~/Views/UserLayout/Index.cshtml";
@@ -34,45 +34,63 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-hover table-inbox">
-                            <tr>
-                                <th>#</th>
-                                <th>Gonderici</th>
-                                <th>Konu</th>
-                                <th>Icerik</th>
-                                <th>Kategori</th>
-                                <th>Gonderim Tarihi</th>
-                            </tr>
+                        <table class="table table-hover table-inbox" style="table-layout: fixed; width: 100%;">
+                            <colgroup>
+                                <col style="width: 40px;" />
+                                <col style="width: 15%;" />
+                                <col style="width: 22%;" />
+                                <col style="width: 22%;" />
+                                <col style="width: 12%;" />
+                                <col style="width: 14%;" />
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Gönderici</th>
+                                    <th>Konu</th>
+                                    <th>İçerik</th>
+                                    <th>Kategori</th>
+                                    <th style="white-space: nowrap;">Gönderim Tarihi</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 @foreach (var item in Model)
                                 {
+                                    var rawPreview = System.Text.RegularExpressions.Regex.Replace(item.MessageDetail ?? "", "<[^>]+>", "");
+                                    rawPreview = rawPreview.Length > 30 ? rawPreview.Substring(0, 30) + "..." : rawPreview;
                                     <tr>
-                                        <td class=""><label><input type="checkbox" class="i-checks"></label></td>
-                                        <td><a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId">@item.SenderName @item.SenderSurname </a>  </td>
-                                        <td><a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId">@item.Subject </a>  </td>
-                                        <td><a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId">@item.MessageDetail.Substring(0, 20)... </a></td>
-                                        @{                                           
-                                            @switch(item.CategoryName)
-                                            {
-                                                case "Egitim":
-                                                    <td><span class="label label-warning">@item.CategoryName</span></td>
-                                                    break;
-                                                case "Kampanyalar":
-                                                    <td><span class="label label-info">@item.CategoryName</span></td>
-                                                    break;
-                                                case "Sosyal":
-                                                    <td><span class="label label-success">@item.CategoryName</span></td>
-                                                    break;
-                                                case "Finans":
-                                                    <td><span class="label label-primary">@item.CategoryName</span></td>
-                                                    break;
-                                                case "Seyahat":
-                                                    <td><span class="label label-default">@item.CategoryName</span></td>
-                                                    break;
-                                            }
+                                        <td style="text-align:center;"><label><input type="checkbox" class="i-checks"></label></td>
+                                        <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                            <a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId" title="@item.SenderName @item.SenderSurname">@item.SenderName @item.SenderSurname</a>
+                                        </td>
+                                        <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                            <a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId" title="@item.Subject">@item.Subject</a>
+                                        </td>
+                                        <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                            <a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId" title="@rawPreview">@rawPreview</a>
+                                        </td>
+                                        @switch (item.CategoryName)
+                                        {
+                                            case "Egitim":
+                                                <td><span class="label label-warning">@item.CategoryName</span></td>
+                                                break;
+                                            case "Kampanyalar":
+                                                <td><span class="label label-info">@item.CategoryName</span></td>
+                                                break;
+                                            case "Sosyal":
+                                                <td><span class="label label-success">@item.CategoryName</span></td>
+                                                break;
+                                            case "Finans":
+                                                <td><span class="label label-primary">@item.CategoryName</span></td>
+                                                break;
+                                            case "Seyahat":
+                                                <td><span class="label label-default">@item.CategoryName</span></td>
+                                                break;
+                                            default:
+                                                <td><span class="label label-default">@item.CategoryName</span></td>
+                                                break;
                                         }
-                                        
-                                        <td class="text-right mail-date">@item.SendDate.ToString("dd MMMM yyyy")</td>
+                                        <td class="mail-date" style="white-space: nowrap; text-align: right;">@item.SendDate.ToString("dd MMM yyyy")</td>
                                     </tr>
                                 }
                             </tbody>

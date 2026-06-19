@@ -1,8 +1,9 @@
-@model List<MessageWithRecieverInfoViewModel>
+@model List<MessageWithSenderInfoViewModel>
 @{
-    ViewData["Title"] = "Inbox";
+    ViewData["Title"] = "GetMessageListByCategory";
     Layout = "~/Views/UserLayout/Index.cshtml";
 }
+
 
 <div class="inbox-area">
     <div class="container">
@@ -33,20 +34,33 @@
                             <button class="btn btn-default btn-sm"><i class="notika-icon notika-right-arrow"></i></button>
                         </div>
                     </div>
+                    @if (!Model.Any())
+                    {
+                        <div style="text-align: center; padding: 60px 20px; color: #888;">
+                            <i class="notika-icon notika-mail" style="font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.4;"></i>
+                            <h4 style="margin-bottom: 8px; color: #aaa;">Bu kategoride mesaj bulunamadı</h4>
+                            <p style="margin: 0; font-size: 13px;">Henüz bu kategoriye ait bir mesaj almadınız.</p>
+                        </div>
+                    }
+                    else
+                    {
                     <div class="table-responsive">
+
                         <table class="table table-hover table-inbox" style="table-layout: fixed; width: 100%;">
                             <colgroup>
                                 <col style="width: 40px;" />
-                                <col style="width: 22%;" />
-                                <col style="width: 28%;" />
-                                <col style="width: 14%;" />
                                 <col style="width: 15%;" />
+                                <col style="width: 22%;" />
+                                <col style="width: 22%;" />
+                                <col style="width: 12%;" />
+                                <col style="width: 14%;" />
                             </colgroup>
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Alıcı</th>
+                                    <th>Gönderici</th>
                                     <th>Konu</th>
+                                    <th>İçerik</th>
                                     <th>Kategori</th>
                                     <th style="white-space: nowrap;">Gönderim Tarihi</th>
                                 </tr>
@@ -54,22 +68,18 @@
                             <tbody>
                                 @foreach (var item in Model)
                                 {
+                                    var rawPreview = System.Text.RegularExpressions.Regex.Replace(item.MessageDetail ?? "", "<[^>]+>", "");
+                                    rawPreview = rawPreview.Length > 30 ? rawPreview.Substring(0, 30) + "..." : rawPreview;
                                     <tr>
                                         <td style="text-align:center;"><label><input type="checkbox" class="i-checks"></label></td>
                                         <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                            <a href="#">
-                                            @if (item.RecieverName == "Bilinmeyen")
-                                            {
-                                                @item.RecieverEmail
-                                            }
-                                            else
-                                            {
-                                                @(item.RecieverName + " " + item.RecieverSurname)
-                                            }
-                                            </a>
+                                            <a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId" title="@item.SenderName @item.SenderSurname">@item.SenderName @item.SenderSurname</a>
                                         </td>
                                         <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
-                                            <a href="#" title="@item.Subject">@item.Subject</a>
+                                            <a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId" title="@item.Subject">@item.Subject</a>
+                                        </td>
+                                        <td style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                                            <a asp-controller="Message" asp-action="MessageDetail" asp-route-id="@item.MessageId" title="@rawPreview">@rawPreview</a>
                                         </td>
                                         @switch (item.CategoryName)
                                         {
@@ -98,6 +108,7 @@
                             </tbody>
                         </table>
                     </div>
+                    }
                 </div>
             </div>
         </div>

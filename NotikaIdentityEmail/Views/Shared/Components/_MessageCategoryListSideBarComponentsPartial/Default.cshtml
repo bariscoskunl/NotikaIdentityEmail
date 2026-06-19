@@ -3,7 +3,7 @@
     <ul class="inbox-st-nav">
         @foreach (var item in Model)
         {
-            <li><a href="#"><i class="@item.CategoryIconUrl"></i> @item.CategoryName</a></li>
+            <li><a asp-action="GetMessageListByCategory" asp-route-categoryId="@item.CategoryId" asp-controller="Message"><i class="@item.CategoryIconUrl"></i> @item.CategoryName</a></li>
         }       
     </ul>
 </div>

@@ -99,7 +99,8 @@ namespace NotikaIdentityEmail.Controllers
                 var result = await _userManager.ResetPasswordAsync(user, token, resetPasswordViewModel.Password);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("UserLogin", "Login");
+                    ViewData["Message"] = "Şifre başarıyla değiştirilmiştir.";
+                    return View();
                 }
                 foreach (var error in result.Errors)
                 {

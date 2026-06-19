@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -110,6 +110,37 @@ namespace NotikaIdentityEmail.Controllers
             _context.Messages.Add(message);
             _context.SaveChanges();
             return RedirectToAction("Sendbox");
+        }
+
+        public async Task<IActionResult> GetMessageListByCategory(int categoryId)
+        {
+            var user = await _userManager.FindByNameAsync(User.Identity.Name);
+
+            var values = (from m in _context.Messages
+                          join u in _context.Users
+                          on m.SenderEmail.Trim().ToLower() equals u.Email.Trim().ToLower() into userGroup
+                          from sender in userGroup.DefaultIfEmpty()
+
+                          join c in _context.Categories
+                          on m.CategoryId equals c.CategoryId into categoryGroup
+                          from category in categoryGroup.DefaultIfEmpty()
+
+                          where m.ReceiverEmail.Trim().ToLower() == user.Email.Trim().ToLower()
+                                && m.CategoryId == categoryId
+                          select new MessageWithSenderInfoViewModel
+                          {
+                              MessageId = m.MessageId,
+                              MessageDetail = m.MessageDetail,
+                              Subject = m.Subject,
+                              SendDate = m.SendDate,
+                              SenderEmail = m.SenderEmail,
+                              SenderName = sender != null ? sender.Name : "Bilinmeyen",
+                              SenderSurname = sender != null ? sender.Surname : "Kullanici",
+                              CategoryName = category != null ? category.CategoryName : "Kategori yok"
+                          }).ToList();
+
+            ViewBag.SenderEmail = user.Email;
+            return View(values);
         }
 
     }
