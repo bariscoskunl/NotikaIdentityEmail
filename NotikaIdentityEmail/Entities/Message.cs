@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
 namespace NotikaIdentityEmail.Entities
 {
     public class Message
@@ -15,7 +13,8 @@ namespace NotikaIdentityEmail.Entities
         public int CategoryId { get; set; }
         public Category Category { get; set; }
 
-        [ForeignKey("SenderEmail")]
+        // AppUser ile ilişki için ayrı FK (AspNetUsers.Id'ye bağlanır)
+        public string? SenderId { get; set; }
         public AppUser? Sender { get; set; }
     }
 }

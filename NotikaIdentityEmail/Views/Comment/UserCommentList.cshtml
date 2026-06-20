@@ -1,0 +1,76 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model List<Comment>
+@{
+    TempData["Title"] = "RoleList";
+    Layout = "~/Views/UserLayout/Index.cshtml";
+    int count = 0;
+}
+<div class="form-element-area">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <div class="form-element-list">
+                    <div class="basic-tb-hd">
+                        <h2>Yorum Listesi</h2>
+                    </div>
+                    <div class="row">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>#</th>
+                                <th>Kullanici</th>
+                                <th>Yorum Detayı</th>
+                                <th>Durum</th>
+                                <th>Yorum Sil</th>
+                                <th>Pasif Yap</th>
+                                <th>Yourumu Onayla</th>
+                            </tr>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    count++;
+                                    <tr>
+                                        <td>@count</td>
+                                        <td>@item.AppUser.Name @item.AppUser.Surname</td>
+                                        <td>@item.CommentDetail</td>
+
+                                        @try
+                                        {
+                                            @switch(item.CommentStatus)
+                                            {
+                                                case "Yorum onaylandı":
+                                                    <td class="text-success bg-primary " style="font-weight: bold;">@item.CommentStatus</td>
+                                                    break;
+                                                case "Spam / Engellendi":
+                                                    <td class="text-danger bg-warning">@item.CommentStatus</td>
+                                                    break;
+                                                case "Onay bekliyor":
+                                                    <td class="text-warning bg-info">@item.CommentStatus</td>
+                                                    break;
+                                                case "Toksik yorum":
+                                                    <td class="text-danger bg-danger" style="font-weight: bold;">@item.CommentStatus</td>
+                                                    break;
+                                                case "Yorum silindi":
+                                                    <td class="text-muted bg-dark " style="text-decoration: line-through;">@item.CommentStatus</td>
+                                                    break;
+                                                default:
+                                                    <td class="text-dark">@item.CommentStatus</td>
+                                                    break;
+                                            }
+                                        }
+                                        catch
+                                        {
+                                            <td class="text-muted">Durum Alınamadı</td>
+                                        }
+                                        <td><a asp-action="DeleteComment" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-danger">Sil</a></td>
+                                        <td><a asp-action="UpdateComment" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-warning">Pasif Yap</a></td>
+                                        <td><a asp-action="ApproveComment" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-info">Yourumu Onayla</a></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

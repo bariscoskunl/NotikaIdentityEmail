@@ -105,6 +105,7 @@ namespace NotikaIdentityEmail.Controllers
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
 
             message.SenderEmail = user.Email;
+            message.SenderId = user.Id;
             message.SendDate = DateTime.Now;
             message.IsRead = false;
             _context.Messages.Add(message);
