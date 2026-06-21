@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @model List<Comment>
 @{
     TempData["Title"] = "RoleList";
@@ -13,6 +13,12 @@
                     <div class="basic-tb-hd">
                         <h2>Yorum Listesi</h2>
                     </div>
+                    @if (TempData["ApiDebug"] != null)
+                    {
+                        <div class="alert alert-danger" style="margin-top: 10px; margin-bottom: 20px;">
+                            <strong>API Hata Detayı:</strong> @TempData["ApiDebug"]
+                        </div>
+                    }
                     <div class="row">
                         <table class="table table-bordered">
                             <tr>
