@@ -27,6 +27,7 @@
                                 <th>Yorum Detayı</th>
                                 <th>Durum</th>
                                 <th>Yorum Sil</th>
+                                <th>Toksik yap</th>
                                 <th>Pasif Yap</th>
                                 <th>Yourumu Onayla</th>
                             </tr>
@@ -55,7 +56,7 @@
                                                 case "Toksik yorum":
                                                     <td class="text-danger bg-danger" style="font-weight: bold;">@item.CommentStatus</td>
                                                     break;
-                                                case "Yorum silindi":
+                                                case "Pasif yorum":
                                                     <td class="text-muted bg-dark " style="text-decoration: line-through;">@item.CommentStatus</td>
                                                     break;
                                                 default:
@@ -68,8 +69,9 @@
                                             <td class="text-muted">Durum Alınamadı</td>
                                         }
                                         <td><a asp-action="DeleteComment" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-danger">Sil</a></td>
-                                        <td><a asp-action="UpdateComment" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-warning">Pasif Yap</a></td>
-                                        <td><a asp-action="ApproveComment" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-info">Yourumu Onayla</a></td>
+                                        <td><a asp-action="CommentStatusChangeToToxic" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-warning">Toksik</a></td>
+                                        <td><a asp-action="CommentStatusChangeToPasive" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-primary">Pasif Yap</a></td>
+                                        <td><a asp-action="CommentStatusChangeToActive" asp-controller="Comment" asp-route-id="@item.CommentId" class="btn btn-info">Yourumu Onayla</a></td>
                                     </tr>
                                 }
                             </tbody>

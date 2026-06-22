@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NotikaIdentityEmail.Context;
 using NotikaIdentityEmail.Entities;
+using System.Text;
 using System.Text.Json;
 
 namespace NotikaIdentityEmail.Controllers
@@ -11,15 +12,17 @@ namespace NotikaIdentityEmail.Controllers
     {
         private EmailContext _context;
         private UserManager<AppUser> _userManager;
+        private readonly IConfiguration _configuration;
 
-        public CommentController(EmailContext context, UserManager<AppUser> userManager)
+        public CommentController(EmailContext context, UserManager<AppUser> userManager, IConfiguration configuration)
         {
             _context = context;
             _userManager = userManager;
+            _configuration = configuration;
         }
         public IActionResult UserComments()
         {
-            var values = _context.Comments.Include(c => c.AppUser).ToList();
+            var values = _context.Comments.Include(c => c.AppUser).Where(c => c.CommentStatus == "Yorum onaylandı").ToList();
             return View(values);
         }
 
@@ -42,31 +45,52 @@ namespace NotikaIdentityEmail.Controllers
             comment.CommentDate = DateTime.Now;
             comment.CommentStatus = "Onay bekliyor";
 
-            // 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
             //Toxic bert api analizi
             using (var client = new HttpClient())
             {
-                var apiKey = "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";
+                var apiKey = _configuration["HuggingFace:apiKey"];
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
-                var requestBody = new // JSON formatında gönderilecek veriyi oluşturun             
-                {
-                    inputs = comment.CommentDetail,
-                };
-                var json = JsonSerializer.Serialize(requestBody); // olusturulan veriyi json formatına çeviriyoruz
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json"); // donusumden sonra json formatında content oluşturuyoruz content icine atiyoruz
 
                 try
                 {
-                    // api-inference adresi DNS sorunlarına yol açtığı için yeni yönlendirici (router) adresini kullanıyoruz
-                    var response = await client.PostAsync("https://router.huggingface.co/hf-inference/models/unitary/toxic-bert", content);
-                    if (response.IsSuccessStatusCode)
+                    var translateRequestBody = new
                     {
-                        var responseString = await response.Content.ReadAsStringAsync(); // gelen cevabı stringe çeviriyoruz
-                        if (responseString.TrimStart().StartsWith("["))
+                        inputs = comment.CommentDetail,
+                    };
+                    var translateJson = JsonSerializer.Serialize(translateRequestBody);
+                    var translateContent = new StringContent(translateJson, Encoding.UTF8, "application/json");
+
+                    var translateResponse = await client.PostAsync("https://router.huggingface.co/hf-inference/models/Helsinki-NLP/opus-mt-tr-en", translateContent);
+                    var translateResponseString = await translateResponse.Content.ReadAsStringAsync();
+
+                    string englishText = comment.CommentDetail; // Varsayılan olarak orijinal metni kullan
+                    if (translateResponseString.TrimStart().StartsWith("["))
+                    {
+                        var translateDoc = JsonDocument.Parse(translateResponseString);
+                        englishText = translateDoc.RootElement[0].GetProperty("translation_text").GetString();// Çeviri başarılıysa İngilizce metni kullan
+                    }
+
+                    var toxicRequestBody = new
+                    {
+                        inputs = englishText,
+                    };
+
+
+
+                    var toxicJson = JsonSerializer.Serialize(toxicRequestBody); // olusturulan veriyi json formatına çeviriyoruz
+                    var toxicContent = new StringContent(toxicJson, System.Text.Encoding.UTF8, "application/json"); // donusumden sonra json formatında content oluşturuyoruz content icine atiyoruz
+
+
+                    // api-inference adresi DNS sorunlarına yol açtığı için yeni yönlendirici (router) adresini kullanıyoruz
+                    var toxicResponse = await client.PostAsync("https://router.huggingface.co/hf-inference/models/unitary/toxic-bert", toxicContent);
+                    if (toxicResponse.IsSuccessStatusCode)
+                    {
+                        var toxicResponseString = await toxicResponse.Content.ReadAsStringAsync(); // gelen cevabı stringe çeviriyoruz
+                        if (toxicResponseString.TrimStart().StartsWith("["))
                         {
-                            var doc = JsonDocument.Parse(responseString);
+                            var toxicDoc = JsonDocument.Parse(toxicResponseString);
                             bool isToxic = false;
-                            foreach (var item in doc.RootElement[0].EnumerateArray())
+                            foreach (var item in toxicDoc.RootElement[0].EnumerateArray())
                             {
                                 string label = item.GetProperty("label").GetString();
                                 double score = item.GetProperty("score").GetDouble();
@@ -87,8 +111,8 @@ namespace NotikaIdentityEmail.Controllers
                     // API başarısız yanıt dönerse, statü zaten "Onay bekliyor" olarak kalır
                     else
                     {
-                        var errorBody = await response.Content.ReadAsStringAsync();
-                        TempData["ApiDebug"] = $"API Hata Kodu: {(int)response.StatusCode} - Yanıt: {errorBody}";
+                        var errorBody = await toxicResponse.Content.ReadAsStringAsync();
+                        TempData["ApiDebug"] = $"API Hata Kodu: {(int)toxicResponse.StatusCode} - Yanıt: {errorBody}";
                     }
                 }
                 catch (Exception ex)
@@ -110,8 +134,31 @@ namespace NotikaIdentityEmail.Controllers
             {
                 return NotFound();
             }
-            _context.Remove(comment);
+            _context.Comments.Remove(comment);
             await _context.SaveChangesAsync();
+            return RedirectToAction("UserCommentList");
+        }
+
+        public IActionResult CommentStatusChangeToToxic(int id)
+        {
+            var values = _context.Comments.Find(id);
+            values.CommentStatus = "Toksik yorum";
+            _context.SaveChanges();
+            return RedirectToAction("UserCommentList");
+        }
+
+        public IActionResult CommentStatusChangeToPasive(int id)
+        {
+            var values = _context.Comments.Find(id);
+            values.CommentStatus = "Pasif yorum";
+            _context.SaveChanges();
+            return RedirectToAction("UserCommentList");
+        }
+        public IActionResult CommentStatusChangeToActive(int id)
+        {
+            var values = _context.Comments.Find(id);
+            values.CommentStatus = "Yorum onaylandı";
+            _context.SaveChanges();
             return RedirectToAction("UserCommentList");
         }
     }
