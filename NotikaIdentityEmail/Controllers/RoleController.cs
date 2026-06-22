@@ -7,7 +7,9 @@ using NotikaIdentityEmail.Models.IdentityModels;
 
 namespace NotikaIdentityEmail.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+
+
     public class RoleController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -54,7 +56,11 @@ namespace NotikaIdentityEmail.Controllers
         public async Task<IActionResult> UpdateRole(string id)
         {
             var role = await _roleManager.Roles.FirstOrDefaultAsync(x => x.Id == id);
-            UpdateRoleViewModel updateRoleViewModel = new UpdateRoleViewModel()
+            if (role == null)
+            {
+                return RedirectToAction("RoleList");
+            }
+                UpdateRoleViewModel updateRoleViewModel = new UpdateRoleViewModel()
             {
                 RoleId = role.Id,
                 RoleName = role.Name

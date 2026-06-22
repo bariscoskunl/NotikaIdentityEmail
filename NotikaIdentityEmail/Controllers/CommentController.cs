@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using System.Text.Json;
 
 namespace NotikaIdentityEmail.Controllers
 {
+    [Authorize]
     public class CommentController : Controller
     {
         private EmailContext _context;
@@ -26,18 +28,21 @@ namespace NotikaIdentityEmail.Controllers
             return View(values);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult UserCommentList()
         {
             var values = _context.Comments.Include(c => c.AppUser).ToList();
             return View(values);
         }
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Member,User")]
         public PartialViewResult CreateComment()
         {
             return PartialView();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager,Member,User")]
         public async Task<IActionResult> CreateComment(Comment comment)
         {
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
@@ -127,6 +132,7 @@ namespace NotikaIdentityEmail.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("UserCommentList");
         }
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeleteComment(int id)
         {
             var comment = await _context.Comments.FindAsync(id);
@@ -139,6 +145,7 @@ namespace NotikaIdentityEmail.Controllers
             return RedirectToAction("UserCommentList");
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult CommentStatusChangeToToxic(int id)
         {
             var values = _context.Comments.Find(id);
@@ -147,6 +154,7 @@ namespace NotikaIdentityEmail.Controllers
             return RedirectToAction("UserCommentList");
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult CommentStatusChangeToPasive(int id)
         {
             var values = _context.Comments.Find(id);
@@ -154,6 +162,8 @@ namespace NotikaIdentityEmail.Controllers
             _context.SaveChanges();
             return RedirectToAction("UserCommentList");
         }
+
+        [Authorize(Roles = "Admin,Manager")]
         public IActionResult CommentStatusChangeToActive(int id)
         {
             var values = _context.Comments.Find(id);

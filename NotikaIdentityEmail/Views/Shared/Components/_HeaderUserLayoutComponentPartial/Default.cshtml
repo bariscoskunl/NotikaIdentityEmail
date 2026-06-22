@@ -1,4 +1,4 @@
-﻿<div class="header-top-area">
+<div class="header-top-area">
     <div class="container">
         <div class="row">
             <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -22,13 +22,22 @@
                         @await Component.InvokeAsync("_MessageListOnNavbarComponentPartial")
 
                         <li class="nav-item nc-al">
-                            <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-alarm"></i></span><div class="spinner4 spinner-4"></div><div class="ntd-ctn"><span>@ViewBag.userEmailCount</span></div></a>
-
+                            <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                                <span><i class="notika-icon notika-alarm"></i></span>
+                                <div class="spinner4 spinner-4" style="left: 20px;"></div>
+                                <div class="ntd-ctn" style="left: 25px;"><span>@ViewBag.notificationCount</span></div>
+                            </a>
                             @await Component.InvokeAsync("_NotificationListOnNavbarComponentPartial")
                         </li>
-                        <li class="nav-item">
-                            <a href="#"  role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-menus"></i></span><div class="spinner4 spinner-4"></div><div class="ntd-ctn"><span>@ViewBag.notificationCount</span></div></a>
-                        </li>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a href="/Login/Logout" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                                    <span><i class="notika-icon notika-close"></i> <span style="font-size: 14px; margin-left: 5px;">Çıkış Yap</span></span>
+                                </a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

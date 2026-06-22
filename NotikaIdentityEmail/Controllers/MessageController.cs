@@ -9,7 +9,7 @@ using NotikaIdentityEmail.Models.MessageViewModels;
 
 namespace NotikaIdentityEmail.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin,Manager,Member,User")]
     public class MessageController : Controller
     {
         private readonly EmailContext _context;

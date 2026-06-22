@@ -1,7 +1,7 @@
 @model List<MessageListWithUserInfoViewModel>
 
 <li class="nav-item dropdown">
-    <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-mail"></i></span></a>
+    <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-mail"></i></span><div class="spinner4 spinner-4" style="left: 20px;"></div><div class="ntd-ctn" style="left: 25px;"><span>@ViewBag.userEmailCount</span></div></a>
     <div role="menu" class="dropdown-menu message-dd animated zoomIn">
         <div class="hd-mg-tt">
             <h2>Messages</h2>
