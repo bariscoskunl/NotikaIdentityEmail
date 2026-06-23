@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +52,23 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = jwtSettings.Audience,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key))
     };
+}).AddGoogle(GoogleDefaults.AuthenticationScheme, options =>                // Google Authentication Configuration
+{
+    options.ClientId = builder.Configuration["GoogleLogin:ClientId"];
+    options.ClientSecret = builder.Configuration["GoogleLogin:ClientSecret"];
+    
+    // Google'ın her girişte hesap seçme ekranını zorunlu göstermesi için:
+    options.Events.OnRedirectToAuthorizationEndpoint = context =>
+    {
+        context.Response.Redirect(context.RedirectUri + "&prompt=select_account");
+        return Task.CompletedTask;
+    };
 });
+
+
+
+
+
 //  AddCookie içindeki LoginPath ayarlarını Identity projesinde burası yönetir:
 builder.Services.ConfigureApplicationCookie(options =>
 {
