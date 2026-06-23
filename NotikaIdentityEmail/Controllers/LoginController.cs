@@ -2,10 +2,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using NotikaIdentityEmail.Context;
 using NotikaIdentityEmail.Entities;
 using NotikaIdentityEmail.Models.IdentityModels;
+using NotikaIdentityEmail.Models.JwtModels;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 
 namespace NotikaIdentityEmail.Controllers
 {
@@ -15,12 +20,14 @@ namespace NotikaIdentityEmail.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly EmailContext _context;
         private readonly UserManager<AppUser> _userManager;
+        private readonly JwtSettingsModel _jwtSettingsModel;
 
-        public LoginController(SignInManager<AppUser> signInManager, EmailContext context, UserManager<AppUser> userManager)
+        public LoginController(SignInManager<AppUser> signInManager, EmailContext context, UserManager<AppUser> userManager, IOptions<JwtSettingsModel> jwtSettingsModel)
         {
             _signInManager = signInManager;
             _context = context;
             _userManager = userManager;
+            _jwtSettingsModel = jwtSettingsModel.Value;
         }
         [HttpGet]
         public IActionResult UserLogin()
@@ -29,18 +36,20 @@ namespace NotikaIdentityEmail.Controllers
         }
         [HttpPost]
         public async Task<IActionResult> UserLogin(UserLoginViewModel model)
-        {
+        {            
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
             var value = _context.Users.FirstOrDefault(x => x.UserName == model.UserName || x.Email == model.UserName);
+
             if (value == null)
             {
                 ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı!");
                 return View(model);
             }
+
             if (!value.EmailConfirmed)
             {
                 ModelState.AddModelError("", "E-Mail adresiniz henüz onaylanmamış.");
@@ -51,16 +60,60 @@ namespace NotikaIdentityEmail.Controllers
                 ModelState.AddModelError("", "Kullanıcı pasif durumda, giriş yapamaz!");
                 return View(model);
             }
+            SimpleUserViewModel simpleUserViewModel = new SimpleUserViewModel()
+            {
+                Id = value.Id,
+                UserName = value.UserName ?? "",
+                Email = value.Email ?? "",
+                Name = value.Name ?? "",
+                Surname = value.Surname ?? "",
+                City = value.City ?? "Belirtilmemis",               
+            };
 
             var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, true, true);
             if (result.Succeeded)
             {
+                var token = GenerateJwtToken(simpleUserViewModel);
+                Response.Cookies.Append("jwtToken", token, new CookieOptions 
+                { 
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddMinutes(30) 
+                });
                 return RedirectToAction("EditProfile", "Profile");
             }
 
             ModelState.AddModelError("", "Kullanıcı adı veya şifre hatalı!");
             return View(model);
         }
+
+        public string GenerateJwtToken(SimpleUserViewModel simpleUserViewModel)
+        {             
+            var claim = new[]
+            {
+                new Claim ("name" , simpleUserViewModel.Name),
+                new Claim ("surname" , simpleUserViewModel.Surname),
+                new Claim ("city" , simpleUserViewModel.City),
+                new Claim ("userName" , simpleUserViewModel.UserName),
+                new Claim (ClaimTypes.NameIdentifier, simpleUserViewModel.Id),
+                new Claim (ClaimTypes.Email, simpleUserViewModel.Email),
+                new Claim (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettingsModel.Key)); 
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); 
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettingsModel.Issuer, 
+                audience: _jwtSettingsModel.Audience,
+                claims: claim, 
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettingsModel.ExpireMinutes), 
+                signingCredentials: creds 
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token); 
+        }
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> UserLogout()
