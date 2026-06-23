@@ -9,6 +9,7 @@ namespace NotikaIdentityEmail.Entities
         public string? ImageUrl { get; set; }
         public string? City { get; set; }
         public int? ActivationCode { get; set; }
+        public bool IsActive { get; set; }
 
         public List<Comment> Comments { get; set; }
         public List<Message>? SentMessages { get; set; }
