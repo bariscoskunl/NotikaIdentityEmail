@@ -1,8 +1,23 @@
-﻿@{
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center" style="margin-top: 50px;">
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <h1 class="display-4">Notika Yönetim Paneline Hoşgeldiniz</h1>
+        <p style="font-size: 16px; margin-top: 20px;">Lütfen işlemlere devam etmek için giriş yapınız veya yeni bir hesap oluşturunuz.</p>
+        <div style="margin-top: 30px;">
+            <a asp-controller="Login" asp-action="UserLogin" class="btn btn-success" style="padding: 10px 30px; font-size: 16px; margin-right: 10px;">Giriş Yap</a>
+            <a asp-controller="Register" asp-action="CreateUser" class="btn btn-primary" style="padding: 10px 30px; font-size: 16px;">Kayıt Ol</a>
+        </div>
+    }
+    else
+    {
+        <h1 class="display-4">Tekrar Hoşgeldiniz, @User.Identity.Name!</h1>
+        <p style="font-size: 16px; margin-top: 20px;">Notika paneli üzerinden istatistiklerinizi, mesajlarınızı ve diğer verilerinizi yönetebilirsiniz.</p>
+        <div style="margin-top: 30px;">
+            <a asp-controller="UserLayout" asp-action="Index" class="btn btn-info" style="padding: 10px 30px; font-size: 16px;">İstatistikleri Görüntüle</a>
+        </div>
+    }
 </div>

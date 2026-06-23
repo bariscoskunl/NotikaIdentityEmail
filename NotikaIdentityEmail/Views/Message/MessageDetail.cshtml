@@ -1,7 +1,7 @@
 @model Message
 @{
     ViewData["Title"] = "MessageDetail";
-    Layout = "~/Views/UserLayout/Index.cshtml";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
 }
 @{
     var timeDiff = DateTime.Now - Model.SendDate;

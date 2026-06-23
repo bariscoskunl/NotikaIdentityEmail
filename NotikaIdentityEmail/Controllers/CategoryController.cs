@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NotikaIdentityEmail.Context;
 using NotikaIdentityEmail.Entities;
@@ -17,31 +17,6 @@ namespace NotikaIdentityEmail.Controllers
         }
         public IActionResult CategoryList()
         {
-            var token = Request.Cookies["jwtToken"];
-            if (string.IsNullOrEmpty(token))
-            {
-                TempData["ErrorMessage"] = "Lütfen önce giriş yapın.";
-                return RedirectToAction("UserLogin", "Login");
-            }
-
-            JwtSecurityToken jwt;
-            try
-            {
-                var handler = new JwtSecurityTokenHandler();
-                jwt = handler.ReadJwtToken(token);
-            }
-            catch (Exception)
-            {
-                TempData["ErrorMessage"] = "Geçersiz bir token sağlandı.";
-                return RedirectToAction("UserLogin", "Login");
-            }
-
-            var city = jwt.Claims.FirstOrDefault(c => c.Type == "city")?.Value;
-            if (city != "Antalya")
-            {
-                return Forbid(); // Kullanıcı Antalya şehrinde değilse erişimi engelle
-            }
-
 
             var values = _emailContext.Categories.ToList();
             return View(values);

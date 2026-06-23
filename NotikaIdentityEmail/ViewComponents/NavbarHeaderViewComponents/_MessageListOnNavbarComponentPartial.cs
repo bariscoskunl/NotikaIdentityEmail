@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NotikaIdentityEmail.Context;
@@ -20,6 +20,11 @@ namespace NotikaIdentityEmail.ViewComponents.NavbarHeaderViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return View(new List<MessageListWithUserInfoViewModel>());
+            }
+            
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
             if (user == null)
             {

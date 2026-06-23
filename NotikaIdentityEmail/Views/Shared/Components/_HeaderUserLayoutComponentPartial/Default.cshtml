@@ -9,32 +9,45 @@
             <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                 <div class="header-top-menu">
                     <ul class="nav navbar-nav notika-top-nav">
-                        <li class="nav-item dropdown">
-                            <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-search"></i></span></a>
-                            <div role="menu" class="dropdown-menu search-dd animated flipInX">
-                                <div class="search-input">
-                                    <i class="notika-icon notika-left-arrow"></i>
-                                    <input type="text" />
-                                </div>
-                            </div>
-                        </li>
-
-                        @await Component.InvokeAsync("_MessageListOnNavbarComponentPartial")
-
-                        <li class="nav-item nc-al">
-                            <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
-                                <span><i class="notika-icon notika-alarm"></i></span>
-                                <div class="spinner4 spinner-4" style="left: 20px;"></div>
-                                <div class="ntd-ctn" style="left: 25px;"><span>@ViewBag.notificationCount</span></div>
-                            </a>
-                            @await Component.InvokeAsync("_NotificationListOnNavbarComponentPartial")
-                        </li>
-
                         @if (User.Identity.IsAuthenticated)
                         {
+                            <li class="nav-item dropdown">
+                                <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle"><span><i class="notika-icon notika-search"></i></span></a>
+                                <div role="menu" class="dropdown-menu search-dd animated flipInX">
+                                    <div class="search-input">
+                                        <i class="notika-icon notika-left-arrow"></i>
+                                        <input type="text" />
+                                    </div>
+                                </div>
+                            </li>
+
+                            @await Component.InvokeAsync("_MessageListOnNavbarComponentPartial")
+
+                            <li class="nav-item nc-al">
+                                <a href="#" data-toggle="dropdown" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                                    <span><i class="notika-icon notika-alarm"></i></span>
+                                    <div class="spinner4 spinner-4" style="left: 20px;"></div>
+                                    <div class="ntd-ctn" style="left: 25px;"><span>@ViewBag.notificationCount</span></div>
+                                </a>
+                                @await Component.InvokeAsync("_NotificationListOnNavbarComponentPartial")
+                            </li>
+
                             <li class="nav-item">
-                                <a href="/Login/Logout" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
+                                <a asp-controller="Login" asp-action="UserLogout" role="button" aria-expanded="false" class="nav-link dropdown-toggle">
                                     <span><i class="notika-icon notika-close"></i> <span style="font-size: 14px; margin-left: 5px;">Çıkış Yap</span></span>
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a asp-controller="Login" asp-action="UserLogin" class="nav-link dropdown-toggle">
+                                    <span><i class="notika-icon notika-right-arrow"></i> <span style="font-size: 14px; margin-left: 5px;">Giriş Yap</span></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a asp-controller="Register" asp-action="CreateUser" class="nav-link dropdown-toggle">
+                                    <span><i class="notika-icon notika-menus"></i> <span style="font-size: 14px; margin-left: 5px;">Kayıt Ol</span></span>
                                 </a>
                             </li>
                         }

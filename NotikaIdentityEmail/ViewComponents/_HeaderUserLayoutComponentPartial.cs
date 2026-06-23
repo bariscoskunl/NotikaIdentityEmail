@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NotikaIdentityEmail.Context;
@@ -18,11 +18,26 @@ namespace NotikaIdentityEmail.ViewComponents
         }
         public async Task<IViewComponentResult> InvokeAsync()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                ViewBag.userEmailCount = 0;
+                ViewBag.notificationCount = 0;
+                return View();
+            }
+
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            var userEmail = user.Email;
-            var userMessages = await _emailContext.Messages.Where(m => m.ReceiverEmail == userEmail).CountAsync();
-            ViewBag.userEmailCount = userMessages;
-            ViewBag.notificationCount = _emailContext.Notifications.Count();
+            if (user != null)
+            {
+                var userEmail = user.Email;
+                var userMessages = await _emailContext.Messages.Where(m => m.ReceiverEmail == userEmail).CountAsync();
+                ViewBag.userEmailCount = userMessages;
+            }
+            else
+            {
+                ViewBag.userEmailCount = 0;
+            }
+            
+            ViewBag.notificationCount = await _emailContext.Notifications.CountAsync();
             return View();
         }
     }

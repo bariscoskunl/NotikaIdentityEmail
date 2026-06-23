@@ -1,13 +1,10 @@
-@{
-    Layout = null;
-}
 <!doctype html>
-<html class="no-js" lang="">
+<html class="no-js" lang="tr">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>401 Sayfasi | Notika - Email & Mesaj Uygulamasi</title>
+    <title>@ViewData["Title"] | Notika</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- favicon
@@ -54,23 +51,80 @@
     <!-- modernizr JS
 		============================================ -->
     <script src="/notika-master/notika/green-horizotal/js/vendor/modernizr-2.8.3.min.js"></script>
+    
+    <style>
+        .validation-summary-errors ul {
+            list-style-type: none;
+            padding: 0;
+            color: #ff4a4a;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .field-validation-error {
+            color: #ff4a4a;
+            font-size: 12px;
+            text-align: left;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .nk-navigation a {
+            display: inline-block;
+        }
+        .nk-navigation a[href*="UserLogin"]:hover {
+            width: 95px;
+        }
+        .nk-navigation a[href*="CreateUser"]:hover {
+            width: 95px;
+        }
+        .nk-navigation a[href*="ForgetPassword"]:hover {
+            width: 155px;
+        }
+        .nk-navigation a[href*="Index"]:hover {
+            width: 115px;
+        }
+        .nk-navigation a span {
+            margin-left: 5px;
+        }
+        .nk-block {
+            padding-top: 30px;
+        }
+        .login-content {
+            background-image: url('/notika-master/notika/green-horizotal/img/bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+        .google-btn {
+            background-color: #dd4b39;
+            color: white;
+            width: 100%;
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 2px;
+            text-align: center;
+            display: block;
+            transition: all 0.3s;
+        }
+        .google-btn:hover {
+            background-color: #c23321;
+            color: white;
+            text-decoration: none;
+        }
+        .google-btn i {
+            margin-right: 10px;
+        }
+    </style>
 </head>
 
 <body>
     <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-    <!-- 404 Page area Start-->
-    <div class="error-page-area">
-        <div class="error-page-wrap">
-            <i class="notika-icon notika-close"></i>
-            <h2>Ooopss!! <span class="counter">401</span></h2>
-            <p>Yetkisiz erişim! Endiselenmeyin biz buradayiz</p>
-            <a asp-action="Create" asp-controller="Register" class="btn">Hesap Oluştur</a>
-            <a asp-action="UserLogin" asp-controller="Login" class="btn error-btn-mg">Giris Yap</a>
-        </div>
+    
+    <div class="login-content">
+        @RenderBody()
     </div>
-    <!-- 401 Page area End-->
+
     <!-- jquery
 		============================================ -->
     <script src="/notika-master/notika/green-horizotal/js/vendor/jquery-1.12.4.min.js"></script>
@@ -114,13 +168,17 @@
     <script src="/notika-master/notika/green-horizotal/js/knob/jquery.knob.js"></script>
     <script src="/notika-master/notika/green-horizotal/js/knob/jquery.appear.js"></script>
     <script src="/notika-master/notika/green-horizotal/js/knob/knob-active.js"></script>
+    <!--  Chat JS
+		============================================ -->
+    <script src="/notika-master/notika/green-horizotal/js/chat/jquery.chat.js"></script>
     <!--  wave JS
 		============================================ -->
     <script src="/notika-master/notika/green-horizotal/js/wave/waves.min.js"></script>
     <script src="/notika-master/notika/green-horizotal/js/wave/wave-active.js"></script>
-    <!--  Chat JS
+    <!-- icheck JS
 		============================================ -->
-    <script src="/notika-master/notika/green-horizotal/js/chat/jquery.chat.js"></script>
+    <script src="/notika-master/notika/green-horizotal/js/icheck/icheck.min.js"></script>
+    <script src="/notika-master/notika/green-horizotal/js/icheck/icheck-active.js"></script>
     <!--  todo JS
 		============================================ -->
     <script src="/notika-master/notika/green-horizotal/js/todo/jquery.todo.js"></script>

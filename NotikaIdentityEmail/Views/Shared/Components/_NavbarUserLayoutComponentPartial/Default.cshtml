@@ -59,7 +59,7 @@
                     <div id="Users" class="tab-pane notika-tab-menu-bg animated flipInX">
                         <ul class="notika-main-menu-dropdown">
                             <li>
-                                <a asp-controller="Role" asp-action="UserList">Kullanıcı Listesi</a>
+                                <a asp-controller="User" asp-action="UserList">Kullanıcı Listesi</a>
                             </li>                                           
                             <li>
                                 <a asp-controller="Register" asp-action="CreateUser">Yeni Kullanıcı</a>
@@ -74,6 +74,9 @@
                             <li>
                                 <a asp-controller="Role" asp-action="CreateRole">Yeni Rol Oluştur</a>
                             </li>                                           
+                            <li>
+                                <a asp-controller="Role" asp-action="UserList">Rol Atama (Kullanıcı Listesi)</a>
+                            </li>                                           
                         </ul>
                     </div>                    
                     <div id="Settings" class="tab-pane notika-tab-menu-bg animated flipInX">
@@ -82,9 +85,13 @@
                                 <a asp-controller="Profile" asp-action="EditProfile">Sistem Ayarları</a>
                             </li>                                           
                             <li>
-                                <form asp-controller="Login" asp-action="UserLogout" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-link p-0" style="color:inherit; text-decoration:none;">Çıkış Yap</button>
-                                </form>
+                                <a asp-controller="Category" asp-action="CategoryList">Kategori Listesi</a>
+                            </li>                                           
+                            <li>
+                                <a asp-controller="Category" asp-action="AddCategory">Kategori Ekle</a>
+                            </li>                                           
+                            <li>
+                                <a asp-controller="Login" asp-action="UserLogout">Çıkış Yap</a>
                             </li>                                           
                         </ul>
                     </div>                    

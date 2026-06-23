@@ -1,27 +1,50 @@
-﻿
-<!doctype html>
-<html class="no-js" lang="">
-@await Component.InvokeAsync("_HeadUserLayoutComponentPartial")
-<body>
-    <!-- Header Top Area -->
-    @await Component.InvokeAsync("_HeaderUserLayoutComponentPartial")
-   
-    <!-- Mobile Menu start -->
-    @await Component.InvokeAsync("_MobileMenuUserLayoutComponentPartial")
-   
-    <!-- Navbar area start-->
-    @await Component.InvokeAsync("_NavbarUserLayoutComponentPartial")
-       
-    <!-- Breadcomb area Start-->
-    @await Component.InvokeAsync("_BreadCombUserLayoutComponentPartial")
-  
-    <!-- Inbox area -->
-    @RenderBody()
+@{
+    ViewData["Title"] = "İstatistikler";
+}
 
-    <!-- Start Footer area-->
-    @await Component.InvokeAsync("_FooterUserLayoutComponentPartial")
-
-    <!-- jquery -->
-    @await Component.InvokeAsync("_ScriptsUserLayoutComponentPartial")
-</body>
-</html>
+<div class="container" style="margin-top: 50px; margin-bottom: 50px;">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="invoice-wrap">
+                <div class="invoice-img">
+                    <h2>İstatistikler</h2>
+                </div>
+                <div class="invoice-hds-cus">
+                    <i class="notika-icon notika-bar-chart"></i>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="invoice-sp">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Metrik</th>
+                                        <th>Değer</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Toplam Gelen Mesaj</td>
+                                        <td>@ViewBag.userEmailCount</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>Toplam Bildirim</td>
+                                        <td>@ViewBag.notificationCount</td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>Son Giriş Tarihi</td>
+                                        <td>@DateTime.Now.ToString("dd.MM.yyyy HH:mm")</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

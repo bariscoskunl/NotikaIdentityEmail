@@ -1,0 +1,27 @@
+
+<!doctype html>
+<html class="no-js" lang="">
+@await Component.InvokeAsync("_HeadUserLayoutComponentPartial")
+<body style="min-height: 100vh; display: flex; flex-direction: column;">
+    <!-- Header Top Area -->
+    @await Component.InvokeAsync("_HeaderUserLayoutComponentPartial")
+   
+    <!-- Mobile Menu start -->
+    @await Component.InvokeAsync("_MobileMenuUserLayoutComponentPartial")
+   
+    <!-- Navbar area start-->
+    @await Component.InvokeAsync("_NavbarUserLayoutComponentPartial")
+       
+    <!-- Breadcomb area Start-->
+    @await Component.InvokeAsync("_BreadCombUserLayoutComponentPartial")
+  
+    <!-- Inbox area -->
+    @RenderBody()
+
+    <!-- Start Footer area-->
+    @await Component.InvokeAsync("_FooterUserLayoutComponentPartial")
+
+    <!-- jquery -->
+    @await Component.InvokeAsync("_ScriptsUserLayoutComponentPartial")
+</body>
+</html>

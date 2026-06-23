@@ -3,14 +3,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using NotikaIdentityEmail.Context;
 using NotikaIdentityEmail.Entities;
 using NotikaIdentityEmail.Models.IdentityModels;
 using NotikaIdentityEmail.Models.JwtModels;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 
 namespace NotikaIdentityEmail.Controllers
 {
@@ -20,18 +17,20 @@ namespace NotikaIdentityEmail.Controllers
         private readonly SignInManager<AppUser> _signInManager;
         private readonly EmailContext _context;
         private readonly UserManager<AppUser> _userManager;
-        private readonly JwtSettingsModel _jwtSettingsModel;
 
-        public LoginController(SignInManager<AppUser> signInManager, EmailContext context, UserManager<AppUser> userManager, IOptions<JwtSettingsModel> jwtSettingsModel)
+        public LoginController(SignInManager<AppUser> signInManager, EmailContext context, UserManager<AppUser> userManager)
         {
             _signInManager = signInManager;
             _context = context;
             _userManager = userManager;
-            _jwtSettingsModel = jwtSettingsModel.Value;
         }
         [HttpGet]
         public IActionResult UserLogin()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View();
         }
         [HttpPost]
@@ -60,27 +59,10 @@ namespace NotikaIdentityEmail.Controllers
                 ModelState.AddModelError("", "Kullanıcı pasif durumda, giriş yapamaz!");
                 return View(model);
             }
-            SimpleUserViewModel simpleUserViewModel = new SimpleUserViewModel()
-            {
-                Id = value.Id,
-                UserName = value.UserName ?? "",
-                Email = value.Email ?? "",
-                Name = value.Name ?? "",
-                Surname = value.Surname ?? "",
-                City = value.City ?? "Belirtilmemis",               
-            };
 
             var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, true, true);
             if (result.Succeeded)
             {
-                var token = GenerateJwtToken(simpleUserViewModel);
-                Response.Cookies.Append("jwtToken", token, new CookieOptions 
-                { 
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddMinutes(30) 
-                });
                 return RedirectToAction("EditProfile", "Profile");
             }
 
@@ -88,47 +70,22 @@ namespace NotikaIdentityEmail.Controllers
             return View(model);
         }
 
-        public string GenerateJwtToken(SimpleUserViewModel simpleUserViewModel)
-        {             
-            var claim = new[]
-            {
-                new Claim ("name" , simpleUserViewModel.Name),
-                new Claim ("surname" , simpleUserViewModel.Surname),
-                new Claim ("city" , simpleUserViewModel.City),
-                new Claim ("userName" , simpleUserViewModel.UserName),
-                new Claim (ClaimTypes.NameIdentifier, simpleUserViewModel.Id),
-                new Claim (ClaimTypes.Email, simpleUserViewModel.Email),
-                new Claim (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettingsModel.Key)); 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); 
-
-            var token = new JwtSecurityToken(
-                issuer: _jwtSettingsModel.Issuer, 
-                audience: _jwtSettingsModel.Audience,
-                claims: claim, 
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettingsModel.ExpireMinutes), 
-                signingCredentials: creds 
-                );
-
-            return new JwtSecurityTokenHandler().WriteToken(token); 
-        }
-
-        [HttpPost]
+        [HttpGet]
         [Authorize]
         public async Task<IActionResult> UserLogout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("UserLogin", "Login");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
         public IActionResult ExternalLogin(string provider, string? returnUrl = null)
         {
-            var redirectUrl = Url.Action("ExternalLoginCallBack", "Login", new { returnUrl }); // Burada returnUrl parametresi ile yönlendirme yapılacak sayfa bilgisi alınır.
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl); // Burada provider parametresi ile hangi dış sağlayıcı kullanılacağı belirlenir ve redirectUrl ile yönlendirme yapılacak sayfa bilgisi alınır.
-            return Challenge(properties, provider); // Challenge metodu ile dış sağlayıcıya yönlendirme yapılır.
+            var redirectUrl = Url.Action("ExternalLoginCallBack", "Login", new { returnUrl }); 
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl); 
+            return Challenge(properties, provider); 
         }
+
         [HttpGet]
         public async Task<IActionResult> ExternalLoginCallBack(string? returnUrl = null, string? remoteError = null)
         {
@@ -151,14 +108,13 @@ namespace NotikaIdentityEmail.Controllers
 
             if (user == null)
             {
-                // Kullanıcı sistemde yoksa yeni oluştur
                 user = new AppUser()
                 {
                     UserName = email,
                     Email = email,
                     Name = info.Principal.FindFirstValue(ClaimTypes.GivenName) ?? "Google",
                     Surname = info.Principal.FindFirstValue(ClaimTypes.Surname) ?? "User",
-                    EmailConfirmed = true // Google'dan geldiği için maili onaylı sayıyoruz
+                    EmailConfirmed = true 
                 };
                 var createResult = await _userManager.CreateAsync(user);
                 if (!createResult.Succeeded)
@@ -168,30 +124,25 @@ namespace NotikaIdentityEmail.Controllers
                 isNewUser = true;
             }
 
-            // Google hesabı daha önce bu kullanıcıya bağlanmamışsa bağla
             var logins = await _userManager.GetLoginsAsync(user);
             if (!logins.Any(l => l.LoginProvider == info.LoginProvider && l.ProviderKey == info.ProviderKey))
             {
                 await _userManager.AddLoginAsync(user, info);
             }
 
-            // Kullanıcının rolü yoksa 403 almaması için "User" rolünü ata
             var roles = await _userManager.GetRolesAsync(user);
             if (roles.Count == 0)
             {
                 await _userManager.AddToRoleAsync(user, "User");
             }
 
-            // Giriş yap
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            // Eğer yeni kullanıcıysa eksik bilgilerini (UserName vb.) tamamlaması için Profile yönlendir
             if (isNewUser)
             {
                 return RedirectToAction("EditProfile", "Profile");
             }
 
-            // Eski kullanıcıysa direkt Inbox'a gitsin
             return RedirectToAction("Inbox", "Message");
         }
     }
