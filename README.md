@@ -27,6 +27,10 @@ Uygulama, veritabanı şemasını (Tablolar, İlişkiler) sınıflar üzerinden 
 ### 4. Servisler & Bağımlılık Enjeksiyonu (Dependency Injection)
 Projedeki e-posta gönderme (SMTP), token üretme veya özel işlemler servis sınıflarına ayrılarak (Örn: `IEmailService`) gevşek bağlı (loosely-coupled) bir mimari elde edilmiştir. ASP.NET Core'un kendi `IoC (Inversion of Control)` container'ı kullanılarak bu bağımlılıklar sisteme enjekte edilmektedir.
 
+### 5. Temiz Kod (Clean Code) ve Profesyonel Mimari
+- **Extension Metotları ile Program.cs Yönetimi:** Projenin ana yapılandırma dosyası olan `Program.cs`'in şişmesini önlemek amacıyla JWT ayarları, veritabanı bağlantıları ve Identity konfigürasyonları özel **Extension** sınıflarına (`AuthenticationExtensions`, `DatabaseAndIdentityExtensions` vb.) taşınarak modüler bir yapı elde edilmiştir.
+- **Teknik Dokümantasyon Standardı:** Proje genelindeki kritik algoritmalar (Örn: Dış sağlayıcı ile Login mekanizması, Fluent API kuralları, Token üretimi), sadece kodun ne yaptığını değil "neden" o şekilde yazıldığını da açıklayan kısa ve profesyonel yorum bloklarıyla zenginleştirilmiştir.
+
 ---
 
 ## 🚀 Temel Özellikler
