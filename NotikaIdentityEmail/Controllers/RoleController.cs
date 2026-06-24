@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -93,6 +93,7 @@ namespace NotikaIdentityEmail.Controllers
             TempData["UserId"] = user.Id;
             var roles = await _roleManager.Roles.ToListAsync();
             var userRoles = await _userManager.GetRolesAsync(user);
+            // Sistemdeki tüm roller ile kullanıcının sahip olduğu rolleri karşılaştırarak (Contains) Checkbox için verileri hazırlar
             List<RoleAssignViewModel> roleAssignViewModels = new List<RoleAssignViewModel>();
             foreach (var item in roles) 
             {
@@ -111,6 +112,7 @@ namespace NotikaIdentityEmail.Controllers
             var userId = TempData["UserId"].ToString();
             var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == userId);
             foreach (var item in model) {
+                // UI'dan gelen RoleExists bool değerine göre rol atama/çıkarma (Toggle) işlemi
                 if (item.RoleExists)
                 {
                     await _userManager.AddToRoleAsync(user, item.RoleName);

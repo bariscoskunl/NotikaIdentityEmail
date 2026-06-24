@@ -25,8 +25,10 @@ namespace NotikaIdentityEmail.Controllers
         {
             
             var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            var values = (from m in _context.Messages // mesaj tablosundaki degerlere m uzerinden ulasacagiz
-                join u in _context.Users // user tablosundaki degerlere u uzerinden ulasasacagiz
+            // LINQ Left Outer Join ile mesajları (Messages) ve ilgili tabloları birleştirir
+            // DefaultIfEmpty(): Karşı tabloda eşleşen kayıt (kullanıcı/kategori) bulunamasa bile mesajın kaybolmamasını sağlar
+            var values = (from m in _context.Messages
+                join u in _context.Users
                 on m.SenderEmail equals u.Email into userGroup
                 from sender in userGroup.DefaultIfEmpty() 
 
@@ -34,8 +36,8 @@ namespace NotikaIdentityEmail.Controllers
                 on m.CategoryId equals c.CategoryId into categoryGroup
                 from category in categoryGroup.DefaultIfEmpty()
 
-                where m.ReceiverEmail == user.Email  // giris yapan kullanici mailine esit olan degerden
-                select new MessageWithSenderInfoViewModel  // bunun icine atiyoruz
+                where m.ReceiverEmail == user.Email
+                select new MessageWithSenderInfoViewModel
                 { 
                     MessageId = m.MessageId,  
                     MessageDetail = m.MessageDetail,

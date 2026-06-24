@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace NotikaIdentityEmail.Controllers
@@ -6,7 +6,7 @@ namespace NotikaIdentityEmail.Controllers
     [AllowAnonymous]
     public class ErrorPageController : Controller
     {
-        // Doğrudan bu rotalara istek atılırsa da ilgili sayfalar açılır
+        // Belirli hata kodları için doğrudan erişilebilir rotaların tanımlanması
         [Route("Error/404")]
         public IActionResult Page404()
         {
@@ -25,12 +25,10 @@ namespace NotikaIdentityEmail.Controllers
             return View();
         }
 
-        // Program.cs'den gelen StatusCode'u yakalayan ana metot
+        // Program.cs UseStatusCodePagesWithReExecute üzerinden gelen hataların yakalanıp, URL bozulmadan ilgili görünüme (View) aktarılması
         [Route("Error/{statusCode}")]
         public IActionResult HandleError(int statusCode)
         {
-            // RedirectToAction yerine direkt ilgili View ismini çağırıyoruz.
-            // Böylece URL bozulmaz ve butonlar kararlı çalışır.
             if (statusCode == 404)
             {
                 return View("Page404");
@@ -44,7 +42,7 @@ namespace NotikaIdentityEmail.Controllers
                 return View("Page403");
             }
 
-            // Diğer beklenmeyen tüm hatalar için genel bir hata görünümü
+            // Tanımlanmamış diğer tüm hatalar için varsayılan görünüm
             return View("Page404");
         }
     }

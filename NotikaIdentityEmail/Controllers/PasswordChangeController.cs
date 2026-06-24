@@ -37,8 +37,10 @@ namespace NotikaIdentityEmail.Controllers
                 return View();
             }
 
+            // GeneratePasswordResetTokenAsync: Identity kütüphanesinin sunduğu, kullanıcıya özel ve süreli bir şifre sıfırlama token'ı üretir
             string passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
 
+            // HttpContext.Request.Scheme ile uygulamanın o anki adresi (http/https) alınarak sıfırlama linki dinamik olarak (Url.Action) oluşturulur
             var passwordResetTokenLink = Url.Action("ResetPassword", "PasswordChange", new
             {
                 userId = user.Id,

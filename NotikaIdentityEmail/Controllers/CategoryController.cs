@@ -29,7 +29,8 @@ namespace NotikaIdentityEmail.Controllers
         [HttpPost]
         public IActionResult AddCategory(Category category)
         {
-            category.CategoryStatus = true; // Kategori durumu varsayılan olarak aktif olacak şekilde ayarlanıyor
+            // Yeni eklenen kategoriler varsayılan olarak aktif statüde kaydedilir
+            category.CategoryStatus = true;
             _emailContext.Categories.Add(category);
             _emailContext.SaveChanges();
             return RedirectToAction("CategoryList");

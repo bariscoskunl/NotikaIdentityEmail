@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NotikaIdentityEmail.Context;
 
@@ -53,4 +53,3 @@ namespace NotikaIdentityEmail.Controllers
         }
     }
 }
-// yemi uukb anso zryu

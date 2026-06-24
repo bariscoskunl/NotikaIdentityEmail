@@ -44,6 +44,7 @@ namespace NotikaIdentityEmail.Controllers
                 user.City = model.City;
                 user.Email = model.Email;
                 user.ImageUrl = model.ImageUrl;
+                // PasswordHasher: Identity kütüphanesinin güvenlik standartlarına uygun olarak düz metin şifreyi (plain text) PBKDF2 gibi algoritmalarla şifreler (hash)
                 user.PasswordHash = _userManager.PasswordHasher.HashPassword(user, model.Password);
                 await _userManager.UpdateAsync(user);
             }

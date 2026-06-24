@@ -25,12 +25,14 @@ namespace NotikaIdentityEmail.Controllers
         }
         public async Task<IActionResult> ActivateUser(string userId)
         {
+            // FindByIdAsync: Veritabanından kullanıcıyı asenkron olarak ve güvenli bir şekilde (Id bazlı) getirir
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound();
             }
 
+            // IsActive durumu güncellendikten sonra UpdateAsync ile değişiklikler Identity üzerinden veritabanına yansıtılır
             user.IsActive = true;
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)

@@ -66,9 +66,11 @@ namespace NotikaIdentityEmail.Controllers
                     await _userManager.UpdateAsync(registeredUser);
                 }
 
-                // mail kodlari
+                // Kullanıcıya hesap doğrulama için 6 haneli aktivasyon kodunun e-posta ile gönderilmesi
+                // MimeMessage: MailKit kütüphanesinde e-postanın temel gövdesini ve başlıklarını tutan ana nesne
                 MimeMessage mimeMessage = new MimeMessage();
 
+                // MailboxAddress: Gönderen ve alıcının isim/adres ikilisini standart formatta tanımlar
                 MailboxAddress mailboxAddressFrom = new MailboxAddress(_emailSettings.SenderName, _emailSettings.SenderEmail);
                 mimeMessage.From.Add(mailboxAddressFrom);
 
@@ -81,10 +83,14 @@ namespace NotikaIdentityEmail.Controllers
 
                 mimeMessage.Subject = "Notika Identity Aktivasyon Kodu";
 
+                // SmtpClient: E-postayı ağ üzerinden sunucuya iletmekle sorumlu olan MailKit sınıfı (System.Net.Mail.SmtpClient değil)
                 using (SmtpClient client = new SmtpClient())
                 {
+                    // StartTls: Sunucu ile iletişimi şifreleyerek bağlantı güvenliğini sağlar
                     await client.ConnectAsync(_emailSettings.Host, _emailSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
+                    // Sunucunun gönderim yapabilmesi için yetkilendirme (kimlik doğrulama) aşaması
                     await client.AuthenticateAsync(_emailSettings.SenderEmail, _emailSettings.Password);
+                    // Mesajın gönderilmesi ve işlemin bitiminde sunucuyla bağlantının güvenli şekilde koparılması
                     await client.SendAsync(mimeMessage);
                     await client.DisconnectAsync(true);
                 }

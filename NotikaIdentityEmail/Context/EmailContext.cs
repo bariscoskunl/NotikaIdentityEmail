@@ -19,8 +19,11 @@ namespace NotikaIdentityEmail.Context
         {
             base.OnModelCreating(modelBuilder);
 
+            // Fluent API: Code-First yaklaşımında veritabanı tabloları arasındaki karmaşık ilişkileri ve kısıtlamaları belirler
             modelBuilder.Entity<Message>(entity =>
             {
+                // Bir mesajın bir göndericisi (HasOne), bir kullanıcının ise birden fazla gönderdiği mesajı (WithMany) olabilir.
+                // DeleteBehavior.Restrict: Kullanıcı silindiğinde ona ait mesajların silinmesini (Cascade delete) engelleyerek veri bütünlüğünü korur.
                 entity.HasOne(m => m.Sender)
                       .WithMany(u => u.SentMessages)
                       .HasForeignKey(m => m.SenderId)

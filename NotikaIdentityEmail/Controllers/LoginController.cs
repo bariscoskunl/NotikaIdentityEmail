@@ -60,6 +60,8 @@ namespace NotikaIdentityEmail.Controllers
                 return View(model);
             }
 
+            // PasswordSignInAsync: Şifre ile giriş denemesi yapar. 
+            // isPersistent: true (Tarayıcı kapansa bile oturum açık kalır), lockoutOnFailure: true (Çoklu hatalı denemede hesap kilitlenir)
             var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, true, true);
             if (result.Succeeded)
             {
@@ -81,8 +83,11 @@ namespace NotikaIdentityEmail.Controllers
         [HttpPost]
         public IActionResult ExternalLogin(string provider, string? returnUrl = null)
         {
+            // Dış sağlayıcıdan (örn. Google) dönüş yapılacağı zaman tetiklenecek callback rotasını (ExternalLoginCallBack) oluşturur
             var redirectUrl = Url.Action("ExternalLoginCallBack", "Login", new { returnUrl }); 
+            // Seçilen sağlayıcıya ait kimlik doğrulama özelliklerini ve yönlendirme URL'ini içeren bir konfigürasyon hazırlar
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl); 
+            // Challenge: Kullanıcıyı dış sağlayıcının yetkilendirme ekranına (örn: Google Login sayfası) yönlendiren Identity mekanizmasıdır
             return Challenge(properties, provider); 
         }
 
@@ -96,6 +101,7 @@ namespace NotikaIdentityEmail.Controllers
                 return View("UserLogin");
             }
 
+            // Google vb. dış sağlayıcıdan uygulamanıza dönen yetkilendirme biletini (info, claims) yakalar
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
@@ -124,7 +130,9 @@ namespace NotikaIdentityEmail.Controllers
                 isNewUser = true;
             }
 
+            // GetLoginsAsync: Kullanıcının dış sağlayıcılarla olan mevcut bağlantılarını getirir
             var logins = await _userManager.GetLoginsAsync(user);
+            // Eğer kullanıcı daha önce bu sağlayıcı ile giriş yapmamışsa (ProviderKey eşleşmiyorsa) eşleştirmeyi Identity tablosuna kaydeder
             if (!logins.Any(l => l.LoginProvider == info.LoginProvider && l.ProviderKey == info.ProviderKey))
             {
                 await _userManager.AddLoginAsync(user, info);

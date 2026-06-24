@@ -50,7 +50,7 @@ namespace NotikaIdentityEmail.Controllers
             comment.CommentDate = DateTime.Now;
             comment.CommentStatus = "Onay bekliyor";
 
-            //Toxic bert api analizi
+            // Yorum içeriğinin HuggingFace Toxic-BERT modeli ile yapay zeka tarafından analiz edilmesi
             using (var client = new HttpClient())
             {
                 var apiKey = _configuration["HuggingFace:apiKey"];
@@ -68,11 +68,12 @@ namespace NotikaIdentityEmail.Controllers
                     var translateResponse = await client.PostAsync("https://router.huggingface.co/hf-inference/models/Helsinki-NLP/opus-mt-tr-en", translateContent);
                     var translateResponseString = await translateResponse.Content.ReadAsStringAsync();
 
-                    string englishText = comment.CommentDetail; // Varsayılan olarak orijinal metni kullan
+                    // Model İngilizce çalıştığı için gelen metni çevirerek işleme alıyoruz, hata olursa orijinal metne dönülüyor
+                    string englishText = comment.CommentDetail;
                     if (translateResponseString.TrimStart().StartsWith("["))
                     {
                         var translateDoc = JsonDocument.Parse(translateResponseString);
-                        englishText = translateDoc.RootElement[0].GetProperty("translation_text").GetString();// Çeviri başarılıysa İngilizce metni kullan
+                        englishText = translateDoc.RootElement[0].GetProperty("translation_text").GetString();
                     }
 
                     var toxicRequestBody = new
@@ -82,15 +83,16 @@ namespace NotikaIdentityEmail.Controllers
 
 
 
-                    var toxicJson = JsonSerializer.Serialize(toxicRequestBody); // olusturulan veriyi json formatına çeviriyoruz
-                    var toxicContent = new StringContent(toxicJson, System.Text.Encoding.UTF8, "application/json"); // donusumden sonra json formatında content oluşturuyoruz content icine atiyoruz
+                    // JsonSerializer: C# nesnesini (toxicRequestBody) API'nin anlayabileceği JSON metnine çevirir
+                    var toxicJson = JsonSerializer.Serialize(toxicRequestBody);
+                    // StringContent: JSON metnini HTTP POST isteğinin gövdesine (body) UTF-8 formatında yerleştirmek için sarmalar
+                    var toxicContent = new StringContent(toxicJson, System.Text.Encoding.UTF8, "application/json");
 
-
-                    // api-inference adresi DNS sorunlarına yol açtığı için yeni yönlendirici (router) adresini kullanıyoruz
+                    // DNS sorunlarını önlemek için yönlendirici (router) üzerinden Toxic-BERT modeline istek atılması
                     var toxicResponse = await client.PostAsync("https://router.huggingface.co/hf-inference/models/unitary/toxic-bert", toxicContent);
                     if (toxicResponse.IsSuccessStatusCode)
                     {
-                        var toxicResponseString = await toxicResponse.Content.ReadAsStringAsync(); // gelen cevabı stringe çeviriyoruz
+                        var toxicResponseString = await toxicResponse.Content.ReadAsStringAsync();
                         if (toxicResponseString.TrimStart().StartsWith("["))
                         {
                             var toxicDoc = JsonDocument.Parse(toxicResponseString);
@@ -113,7 +115,7 @@ namespace NotikaIdentityEmail.Controllers
                             comment.CommentStatus = "Onay Bekliyor";
                         }
                     }
-                    // API başarısız yanıt dönerse, statü zaten "Onay bekliyor" olarak kalır
+                    // API başarısız yanıt dönerse veya bağlantı hatası yaşanırsa, yorum güvenli bir şekilde "Onay bekliyor" statüsünde bırakılır
                     else
                     {
                         var errorBody = await toxicResponse.Content.ReadAsStringAsync();
@@ -122,7 +124,6 @@ namespace NotikaIdentityEmail.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Bağlantı hatası durumunda, statü zaten "Onay bekliyor" olarak kalır
                     TempData["ApiDebug"] = $"Bağlantı Hatası: {ex.Message}";
                 }
 
